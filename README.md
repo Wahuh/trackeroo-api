@@ -27,3 +27,13 @@ Activate your virtual environment
 Setup git hooks, linting and formatting on pre-commit.
 
 `pre-commit install`
+
+### Configuring VSCode
+
+Install the Python extension for VSCode: https://marketplace.visualstudio.com/items?itemName=ms-python.python
+
+> MAKE SURE YOUR VIRTUAL ENVIRONMENT IS ACTIVATED FIRST
+
+* Press `cmd + shift + p` and search for 'Python: Select Interpreter'. Select the Python 3.6 which is inside your `venv` folder.
+* Press `cmd + shift + p` and search for 'Python: Select Linter'. Select `flake8` and you'll be prompted to install it.
+* Press `cmd + shift + i` and you should be prompted to choose a formatter for Python files. Install `black` as your formatter.
