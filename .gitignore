@@ -1,5 +1,6 @@
 .chalice/deployments/
 .chalice/venv/
+.chalice/config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
