@@ -74,6 +74,7 @@ Create a directory called `.chalice` then inside of it create a `config.json` fi
   },
   "stages": {
     "dev": {
+      "autogen_policy": false,
       "api_gateway_stage": "api",
       "environment_variables": {
         "DATABASE_URL": "http://localhost:7000"
@@ -82,6 +83,27 @@ Create a directory called `.chalice` then inside of it create a `config.json` fi
   }
 }
 
+```
+
+In the same directory, create a `policy-dev.json` file which looks like:
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cognito-identity:*",
+        "cognito-idp:*",
+        "cognito-sync:*",
+        "iam:ListRoles",
+        "iam:ListOpenIdConnectProviders",
+        "sns:ListPlatformApplications"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
 ```
 
 ### Starting the Server finally!
