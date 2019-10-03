@@ -24,5 +24,4 @@ def post_signup():
     except KeyError:
         raise BadRequestError("Username or password is missing")
     except Exception as e:
-        print(e)
-        raise ChaliceViewError("Oh dear")
+        raise ChaliceViewError(e)
