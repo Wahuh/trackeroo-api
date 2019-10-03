@@ -2,6 +2,7 @@
 .chalice/venv/
 .chalice/config.json
 .chalice/deployed
+.chalice
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
