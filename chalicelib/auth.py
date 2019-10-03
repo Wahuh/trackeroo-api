@@ -14,6 +14,17 @@ authorizer = CognitoUserPoolAuthorizer(
 )
 
 
+def login(username, password):
+    initiate_auth_response = cognito.admin_initiate_auth(
+        AuthFlow="ADMIN_NO_SRP_AUTH",
+        ClientId=app_client_id,
+        UserPoolId=user_pool_id,
+        AuthParameters={"USERNAME": username, "PASSWORD": password},
+    )
+    id_token = initiate_auth_response["AuthenticationResult"]["IdToken"]
+    return id_token
+
+
 def signup(username, password):
     # TODO check if username is already registered
     cognito.admin_create_user(
