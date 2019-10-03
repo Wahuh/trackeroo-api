@@ -10,7 +10,7 @@ app_client_id = os.environ.get("APP_CLIENT_ID")
 user_pool_arn = os.environ.get("USER_POOL_ARN")
 
 authorizer = CognitoUserPoolAuthorizer(
-    user_pool_id, header="Authorization", provider_arns=[user_pool_arn]
+    app_client_id, header="Authorization", provider_arns=[user_pool_arn]
 )
 
 
@@ -37,5 +37,5 @@ def signup(username, password):
     id_token = respond_to_auth_challenge_response["AuthenticationResult"][
         "IdToken"
     ]
-    User.add_one(username=username)
+    # User.add_one(username=username)
     return id_token
