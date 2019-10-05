@@ -1,6 +1,9 @@
 from chalice import Chalice, Response, BadRequestError, ChaliceViewError
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run
+from chalicelib.users import add_user
+from chalicelib.followers import add_follower
+from chalicelib.subscriptions import add_subscription
 
 app = Chalice(app_name="trackeroo-api")
 
@@ -59,5 +62,26 @@ def post_run():
         )
     except KeyError:
         raise BadRequestError("Username or start_time is missing")
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/users", cors=True, methods=["POST"])
+def post_user():
+    try:
+        body = app.current_request.json_body
+        username = body["username"]
+        first_name = body["first_name"]
+        last_name = body["last_name"]
+        age = body["age"]
+        height = body["height"]
+        weight = body["weight"]
+        user = add_user(username, first_name, last_name, age, height, weight)
+        return Response(
+            body={"user": user},
+            status_code=201
+        )
+    except KeyError:
+        raise BadRequestError("Required input is missing")
     except Exception as e:
         raise ChaliceViewError(e)
