@@ -82,7 +82,7 @@ class Subscriptions:
             'subscriptions': [subscription]
         }
         try:
-            put_subscription_response = _subscriptions_table.put_item(Item=new_subscription_item)
+            put_subscription_response = dynamodb_resource.Table('followers').put_item(Item=new_subscription_item)
             print(put_subscription_response, f'inserted new subscription {new_subscription_item}')
             return new_subscription_item
         except Exception as e:

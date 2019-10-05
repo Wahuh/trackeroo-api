@@ -82,6 +82,23 @@ def post_user():
             status_code=201
         )
     except KeyError:
-        raise BadRequestError("Required input is missing")
+        raise BadRequestError("Required key-value is missing")
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/subscriptions", cors=True, methods=["POST"])
+def post_subscription():
+    try:
+        body = app.current_request.json_body
+        username = body["username"]
+        subscription = body["subscription"]
+        subscription = add_subscription(username, subscription)
+        return Response(
+            body={"subscription": subscription},
+            status_code=201,
+        )
+    except KeyError:
+        raise BadRequestError("Required key-value is missing")
     except Exception as e:
         raise ChaliceViewError(e)
