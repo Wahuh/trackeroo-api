@@ -102,3 +102,20 @@ def post_subscription():
         raise BadRequestError("Required key-value is missing")
     except Exception as e:
         raise ChaliceViewError(e)
+
+
+@app.route("/followers", cors=True, methods=["POST"])
+def post_follower():
+    try:
+        body = app.current_request.json_body
+        username = body["username"]
+        follower = body["follower"]
+        follower = add_follower(username, follower)
+        return Response(
+            body={"follower": follower},
+            status_code=201,
+        )
+    except KeyError:
+        raise BadRequestError("Required key-value is missing")
+    except Exception as e:
+        raise ChaliceViewError(e)
