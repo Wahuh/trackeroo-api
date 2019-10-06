@@ -76,18 +76,10 @@ class Run:
                     ':distance': {"N": total_distance},
                     ':time': {"N": time_taken}
                 },
-                ReturnValues="UPDATED_NEW"
+                ReturnValues="ALL_NEW"
             )
             print(patch_run_response)
-            return {
-                "username": username,
-                "run_id": run_id,
-                "finish_time": finish_time,
-                "average_speed": average_speed,
-                "altitude": altitude,
-                "total_distance": total_distance,
-                "time_taken": time_taken
-            }
+            return patch_run_response
         except Exception as e:
             print(e, "<<<<<< RUN CLASS ERROR")
             raise e
@@ -124,7 +116,7 @@ class Followers:
                 ExpressionAttributeValues={
                     ':followers': {"L": [{"S": follower}]},
                 },
-                ReturnValues="UPDATED_NEW"
+                ReturnValues="ALL_NEW"
             )
             return patch_follower_response
         except Exception as e:
@@ -166,7 +158,7 @@ class Subscriptions:
                 ExpressionAttributeValues={
                     ':subscriptions': {"L": [{"S": subscription}]},
                 },
-                ReturnValues="UPDATED_NEW"
+                ReturnValues="ALL_NEW"
             )
             return patch_subscription_response
         except Exception as e:
