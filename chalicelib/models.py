@@ -148,3 +148,26 @@ class Subscriptions:
             return new_subscription_item
         except Exception as e:
             raise e
+
+    @staticmethod
+    def update_one(
+        username,
+        subscription
+    ):
+        try:
+            patch_subscription_response = dynamodb_client.update_item(
+                TableName='subscriptions',
+                Key={
+                    'username': {
+                        'S': username
+                    }
+                },
+                UpdateExpression="SET subscriptions = list_append(subscriptions, :subscriptions)",
+                ExpressionAttributeValues={
+                    ':subscriptions': {"L": [{"S": subscription}]},
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+            return patch_subscription_response
+        except Exception as e:
+            raise e

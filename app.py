@@ -3,7 +3,7 @@ from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run
 from chalicelib.users import add_user
 from chalicelib.followers import add_first_follower, update_followers
-from chalicelib.subscriptions import add_subscription
+from chalicelib.subscriptions import add_first_subscription, update_subscriptions
 
 app = Chalice(app_name="trackeroo-api")
 
@@ -109,21 +109,29 @@ def post_user():
         raise ChaliceViewError(e)
 
 
-@app.route("/subscriptions", cors=True, methods=["POST"])
-def post_subscription():
-    try:
-        body = app.current_request.json_body
-        username = body["username"]
-        subscription = body["subscription"]
-        subscription = add_subscription(username, subscription)
-        return Response(
-            body={"subscription": subscription},
-            status_code=201,
-        )
-    except KeyError:
-        raise BadRequestError("Required key-value is missing")
-    except Exception as e:
-        raise ChaliceViewError(e)
+@app.route("/users/{username}/subscriptions", cors=True, methods=["POST", "PATCH"])
+def post_subscription(username):
+    request = app.current_request
+    if request.method == "PATCH":
+        try:
+            body = app.current_request.json_body
+            subscription = body["subscription"]
+            subscriptions = update_subscriptions(username, subscription)
+            return {"subscriptions": subscriptions}
+        except Exception as e:
+            print(e)
+            raise e
+    elif request.method == "POST":
+        try:
+            body = app.current_request.json_body
+            subscription = body["subscription"]
+            subscription = add_first_subscription(username, subscription)
+            return Response(
+                body={"subscription": subscription},
+                status_code=201,
+            )
+        except Exception as e:
+            raise ChaliceViewError(e)
 
 
 @app.route("/users/{username}/followers", cors=True, methods=["POST", "PATCH"])
@@ -139,11 +147,9 @@ def follower(username):
                 body={"followers": followers},
                 status_code=200,
             )
-        except KeyError:
-            raise BadRequestError("Required key-value is missing")
         except Exception as e:
             raise ChaliceViewError(e)
-    if request.method == "POST":
+    elif request.method == "POST":
         try:
             body = app.current_request.json_body
             follower = body["follower"]
@@ -152,7 +158,5 @@ def follower(username):
                 body={"followers": followers},
                 status_code=201,
             )
-        except KeyError:
-            raise BadRequestError("Required key-value is missing")
         except Exception as e:
             raise ChaliceViewError(e)
