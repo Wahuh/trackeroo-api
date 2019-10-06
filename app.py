@@ -2,7 +2,7 @@ from chalice import Chalice, Response, BadRequestError, ChaliceViewError
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run
 from chalicelib.users import add_user
-from chalicelib.followers import add_follower
+from chalicelib.followers import add_first_follower, update_followers
 from chalicelib.subscriptions import add_subscription
 
 app = Chalice(app_name="trackeroo-api")
@@ -126,18 +126,33 @@ def post_subscription():
         raise ChaliceViewError(e)
 
 
-@app.route("/followers", cors=True, methods=["POST"])
-def post_follower():
-    try:
-        body = app.current_request.json_body
-        username = body["username"]
-        follower = body["follower"]
-        follower = add_follower(username, follower)
-        return Response(
-            body={"follower": follower},
-            status_code=201,
-        )
-    except KeyError:
-        raise BadRequestError("Required key-value is missing")
-    except Exception as e:
-        raise ChaliceViewError(e)
+@app.route("/users/{username}/followers", cors=True, methods=["POST", "PATCH"])
+def follower(username):
+    request = app.current_request
+    if request.method == "PATCH":
+        try:
+            body = app.current_request.json_body
+            follower = body["follower"]
+            print(follower, username)
+            followers = update_followers(username, follower)
+            return Response(
+                body={"followers": followers},
+                status_code=200,
+            )
+        except KeyError:
+            raise BadRequestError("Required key-value is missing")
+        except Exception as e:
+            raise ChaliceViewError(e)
+    if request.method == "POST":
+        try:
+            body = app.current_request.json_body
+            follower = body["follower"]
+            followers = add_first_follower(username, follower)
+            return Response(
+                body={"followers": followers},
+                status_code=201,
+            )
+        except KeyError:
+            raise BadRequestError("Required key-value is missing")
+        except Exception as e:
+            raise ChaliceViewError(e)

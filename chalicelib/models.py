@@ -76,7 +76,7 @@ class Run:
                     ':distance': {"N": total_distance},
                     ':time': {"N": time_taken}
                 },
-                ReturnValues="ALL_NEW"
+                ReturnValues="UPDATED_NEW"
             )
             print(patch_run_response)
             return {
@@ -110,6 +110,27 @@ class Followers:
         except Exception as e:
             raise e
 
+    @staticmethod
+    def update_one(username, follower):
+        try:
+            patch_follower_response = dynamodb_client.update_item(
+                TableName='followers',
+                Key={
+                    'username': {
+                        'S': username
+                    }
+                },
+                UpdateExpression="SET followers = list_append(followers, :followers)",
+                ExpressionAttributeValues={
+                    ':followers': {"L": [{"S": follower}]},
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+            return patch_follower_response
+        except Exception as e:
+            print(e)
+            raise e
+
 
 class Subscriptions:
     @staticmethod
@@ -122,7 +143,7 @@ class Subscriptions:
             'subscriptions': [subscription]
         }
         try:
-            put_subscription_response = dynamodb_resource.Table('followers').put_item(Item=new_subscription_item)
+            put_subscription_response = dynamodb_resource.Table('subscriptions').put_item(Item=new_subscription_item)
             print(put_subscription_response, f'inserted new subscription {new_subscription_item}')
             return new_subscription_item
         except Exception as e:
