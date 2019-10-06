@@ -1,6 +1,6 @@
 from chalice import Chalice, Response, BadRequestError, ChaliceViewError
 from chalicelib.auth import signup, authorizer, login
-from chalicelib.runs import add_run
+from chalicelib.runs import add_run, update_run
 from chalicelib.users import add_user
 from chalicelib.followers import add_follower
 from chalicelib.subscriptions import add_subscription
@@ -49,21 +49,43 @@ def post_login():
         raise ChaliceViewError(e)
 
 
-@app.route("/runs", cors=True, methods=["POST"])
-def post_run():
-    try:
-        body = app.current_request.json_body
-        username = body["username"]
-        start_time = body["start_time"]
-        run = add_run(username, start_time)
-        return Response(
-            body={"run": run},
-            status_code=201,
-        )
-    except KeyError:
-        raise BadRequestError("Username or start_time is missing")
-    except Exception as e:
-        raise ChaliceViewError(e)
+@app.route("/runs", cors=True, methods=["PATCH", "POST"])
+def run():
+    request = app.current_request
+    if request.method == "PATCH":
+        try:
+            body = request.json_body
+            run_id = body["run_id"]
+            username = body["username"]
+            finish_time = body["finish_time"]
+            average_speed = body["average_speed"]
+            altitude = body["altitude"]
+            total_distance = body["total_distance"]
+            time_taken = body["time_taken"]
+            run = update_run(run_id, username, finish_time, average_speed, altitude, total_distance, time_taken)
+            return Response(
+                body={"run": run},
+                status_code=200
+            )
+        except KeyError:
+            raise BadRequestError("Bad request body")
+        except Exception as e:
+            raise ChaliceViewError(e)
+    elif request.method == "POST":
+        try:
+            body = app.current_request.json_body
+            username = body["username"]
+            start_time = body["start_time"]
+            run = add_run(username, start_time)
+            return Response(
+                body={"run": run},
+                status_code=201,
+            )
+        except KeyError:
+            raise BadRequestError("Bad request body")
+        except Exception as e:
+            print(e, "<<<<< APP.PY ROUTE ERROR")
+            raise ChaliceViewError(e)
 
 
 @app.route("/users", cors=True, methods=["POST"])
