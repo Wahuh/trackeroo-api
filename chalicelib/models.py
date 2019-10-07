@@ -205,10 +205,26 @@ class Connection:
                 },
                 UpdateExpression="SET connection_id=:connection",
                 ExpressionAttributeValues={
-                    ':connection': {"S": connection_id}
+                    ':connection': connection_id
                 },
                 ReturnValues="ALL_NEW"
             )
             return updated_connection_response
         except Exception as e:
             raise e
+    
+    @staticmethod
+    def remove_connection_id(username):
+        try:
+            updated_connection_response = _connections_table.update_item(
+                TableName="connections",
+                Key={
+                    'username': username
+                },
+                UpdateExpression="REMOVE connection_id",
+                ReturnValues="ALL_NEW"
+            )
+            return updated_connection_response
+        except Exception as e:
+            raise e
+    
