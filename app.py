@@ -102,7 +102,14 @@ def patch_run():
 @app.route("/users", cors=True, methods=["GET"])
 def fetch_users():
     try:
-        users = get_users()
+        query = app.current_request.query_params
+        print(query, "<<<<<<<query")
+        start_username = None
+        if "start_username" in query:
+            start_username = query["start_username"]
+            print(query["start_username"], "<<<<<<<query[start]")
+            print(start_username)
+        users = get_users(start_username)
         return Response(
             body=users,
             status_code=200
