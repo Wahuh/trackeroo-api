@@ -1,8 +1,8 @@
 from .models import User
 
 
-def add_user(username, first_name, last_name, age, height, weight):
-    return User.add_one(username, first_name, last_name, age, height, weight)
+def add_user(username):
+    return User.add_one(username)
 
 
 def get_users(start_username):
@@ -11,3 +11,7 @@ def get_users(start_username):
 
 def add_follower(username, follower):
     return User.add_follower(username, follower)
+
+
+def add_subscription(username, subscription):
+    return User.add_subscription(username, subscription)
