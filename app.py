@@ -36,7 +36,7 @@ def post_signup():
         username = body["username"]
         jwt = signup(username=username, password=password)
         return Response(
-            body={"username": username},
+            body={"user": {"username": username}},
             status_code=200,
             headers={"Authorization": jwt},
         )
@@ -54,7 +54,7 @@ def post_login():
         username = body["username"]
         jwt = login(username=username, password=password)
         return Response(
-            body={"username": username},
+            body={"user": {"username": username}},
             status_code=200,
             headers={"Authorization": jwt},
         )
