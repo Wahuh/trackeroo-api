@@ -8,18 +8,14 @@ _users_table = connection.Table("users")
 _runs_table = connection.Table("runs")
 _followers_table = connection.Table("followers")
 _subscriptions_table = connection.Table("subscriptions")
+_connections_table = connection.Table("connections")
 
 
 class User:
     @staticmethod
-    def add_one(username, first_name, last_name, age, height, weight):
+    def add_one(username):
         new_user_item = {
             'username': username,
-            'first_name': first_name,
-            'last_name': last_name,
-            'age': age,
-            'height': height,
-            'weight': weight,
             'cumulative_distance': 0,
             'followers': [],
             'subscriptions': []
@@ -30,10 +26,18 @@ class User:
             return new_user_item
         except Exception as e:
             raise e
+    
+    # @staticmethod
+    # def update_one(username, first_name, last_name, age, height, weight):
+    #         'first_name': first_name,
+    #         'last_name': last_name,
+    #         'age': age,
+    #         'height': height,
+    #         'weight': weight,
+            
 
     @staticmethod
     def scan_users(start_username=None):
-        print(start_username,"<<<<<start_username")
         try:
             scan_response = None
             if start_username:
@@ -58,7 +62,6 @@ class User:
             }
             return new_response
         except Exception as e:
-            print(e)
             raise e
 
 
@@ -178,5 +181,34 @@ class Subscriptions:
                 ReturnValues="ALL_NEW"
             )
             return patch_subscription_response
+        except Exception as e:
+            raise e
+
+
+class Connection:
+    @staticmethod
+    def add_one(username):
+        try:
+            new_connection_item = {"username": username}
+            put_connection_response = _connections_table.put_item(Item=new_connection_item)
+            return put_connection_response
+        except Exception as e:
+            raise e
+    
+    @staticmethod
+    def add_connection_id(username, connection_id):
+        try:
+            updated_connection_response = _connections_table.update_item(
+                TableName="connections",
+                Key={
+                    'username': username
+                },
+                UpdateExpression="SET connection_id=:connection",
+                ExpressionAttributeValues={
+                    ':connection': {"S": connection_id}
+                },
+                ReturnValues="ALL_NEW"
+            )
+            return updated_connection_response
         except Exception as e:
             raise e
