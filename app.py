@@ -7,8 +7,8 @@ from chalice import (
     WebsocketDisconnectedError,
 )
 from chalicelib.auth import signup, authorizer, login
-from chalicelib.runs import add_run, update_run
-from chalicelib.users import add_user, get_users, add_follower, add_subscription
+from chalicelib.runs import add_run, update_run, get_runs_by_subscriptions
+from chalicelib.users import add_user, get_users, add_follower, add_subscription, get_user
 import json
 from chalicelib.models import Connection
 
@@ -72,7 +72,6 @@ def post_run():
     except KeyError:
         raise BadRequestError("Bad request body")
     except Exception as e:
-        print(e, "<<<<< APP.PY ROUTE ERROR")
         raise ChaliceViewError(e)
 
 
@@ -96,16 +95,30 @@ def patch_run():
         raise ChaliceViewError(e)
 
 
+@app.route("/runs", methods=["GET"])
+def get_runs():
+    try:
+        query = app.current_request.query_params
+        if "username" in query:
+            username = query["username"]
+            user = get_user(username)
+            print(user)
+            runs = get_runs_by_subscriptions(user["subscriptions"])
+            return Response(
+                body={"runs": runs},
+                status_code=200
+            )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
 @app.route("/users", cors=True, methods=["GET"])
 def fetch_users():
     try:
         query = app.current_request.query_params
-        print(query, "<<<<<<<query")
         start_username = None
         if "start_username" in query:
             start_username = query["start_username"]
-            print(query["start_username"], "<<<<<<<query[start]")
-            print(start_username)
         users = get_users(start_username)
         return Response(
             body=users,
