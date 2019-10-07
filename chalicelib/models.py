@@ -51,6 +51,25 @@ class User:
             return patch_user_response
         except Exception as e:
             raise e
+
+
+    @staticmethod
+    def add_subscription(username, subscription):
+        try:
+            patch_user_response = _users_table.update_item(
+                TableName='users',
+                Key={
+                    'username': username
+                },
+                UpdateExpression="SET subscriptions = list_append(subscriptions, :subscriptions)",
+                ExpressionAttributeValues={
+                    ':subscriptions': [subscription]
+                },
+                ReturnValues="ALL_NEW"
+            )
+            return patch_user_response
+        except Exception as e:
+            raise e
             
 
     @staticmethod
@@ -122,6 +141,9 @@ class Run:
             return patch_run_response
         except Exception as e:
             raise e
+
+    # @staticmethod
+    # def get_runs_by_subscriptions()
 
 
 class Followers:
