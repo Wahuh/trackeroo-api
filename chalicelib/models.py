@@ -20,7 +20,9 @@ class User:
             'age': age,
             'height': height,
             'weight': weight,
-            'cumulative_distance': 0
+            'cumulative_distance': 0,
+            'followers': [],
+            'subscriptions': []
         }
         try:
             put_user_response = _users_table.put_item(Item=new_user_item)
@@ -80,32 +82,25 @@ class Run:
             raise e
 
     @staticmethod
-    def update_one(run_id, username, finish_time, average_speed, altitude, total_distance, time_taken):
+    def update_one(run_id, username, finish_time, average_speed, total_distance):
         try:
-            patch_run_response = dynamodb_client.update_item(
+            patch_run_response = _runs_table.update_item(
                 TableName='runs',
                 Key={
-                    'username': {
-                        'S': username
-                    },
-                    'run_id': {
-                        'S': run_id
-                    }
+                    'username': username,
+                    'run_id': run_id
                 },
-                UpdateExpression='SET finish_time=:finish, average_speed=:average, altitude=:alt, total_distance=:distance, time_taken=:time',
+                UpdateExpression='SET finish_time=:finish, average_speed=:average, total_distance=:distance',
                 ExpressionAttributeValues={
-                    ':finish': {"N": finish_time},
+                    ':finish': {"S": finish_time},
                     ':average': {"N": average_speed},
-                    ':alt': {"N": altitude},
                     ':distance': {"N": total_distance},
-                    ':time': {"N": time_taken}
                 },
                 ReturnValues="ALL_NEW"
             )
             print(patch_run_response)
             return patch_run_response
         except Exception as e:
-            print(e, "<<<<<< RUN CLASS ERROR")
             raise e
 
 
@@ -120,7 +115,7 @@ class Followers:
             'followers': [follower]
         }
         try:
-            put_followers_response = dynamodb_resource.Table('followers').put_item(Item=new_follower_item)
+            put_followers_response = _followers_table.put_item(Item=new_follower_item)
             print(put_followers_response, f'inserted new follower: {new_follower_item}')
             return new_follower_item
         except Exception as e:
@@ -129,12 +124,10 @@ class Followers:
     @staticmethod
     def update_one(username, follower):
         try:
-            patch_follower_response = dynamodb_client.update_item(
+            patch_follower_response = _followers_table.update_item(
                 TableName='followers',
                 Key={
-                    'username': {
-                        'S': username
-                    }
+                    'username': username
                 },
                 UpdateExpression="SET followers = list_append(followers, :followers)",
                 ExpressionAttributeValues={
@@ -142,6 +135,7 @@ class Followers:
                 },
                 ReturnValues="ALL_NEW"
             )
+            print(patch_follower_response)
             return patch_follower_response
         except Exception as e:
             raise e
