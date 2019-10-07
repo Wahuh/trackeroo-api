@@ -98,7 +98,7 @@ def patch_run():
         raise ChaliceViewError(e)
 
 
-@app.route("/runs", methods=["GET"])
+@app.route("/runs", cors=True, methods=["GET"])
 def get_runs():
     try:
         query = app.current_request.query_params
