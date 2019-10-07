@@ -1,7 +1,8 @@
 from chalice import CognitoUserPoolAuthorizer
 import boto3
 import os
-from .models import User
+from .models import User, Connection
+
 
 cognito = boto3.client("cognito-idp", region_name="eu-west-1")
 
@@ -48,5 +49,6 @@ def signup(username, password):
     id_token = respond_to_auth_challenge_response["AuthenticationResult"][
         "IdToken"
     ]
-    # User.add_one(username=username)
+    User.add_one(username=username)
+    Connection.add_one(username=username)
     return id_token
