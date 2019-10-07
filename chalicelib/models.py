@@ -30,16 +30,26 @@ class User:
             raise e
 
     @staticmethod
-    def scan_users():
+    def scan_users(start_username=None):
+        print(start_username,"<<<<<start_username")
         try:
-            scan_response = _users_table.scan(
-                TableName='users',
-                Limit=10
-            )
+            scan_response = None
+            if start_username:
+                scan_response = _users_table.scan(
+                    TableName='users',
+                    Limit=10,
+                    ExclusiveStartKey={"username": start_username}
+                )
+            else:
+                scan_response = _users_table.scan(
+                    TableName='users',
+                    Limit=10
+                )
             users = scan_response["Items"]
             last_username = None
-            if "username" in scan_response["LastEvaluatedKey"]:
-                last_username = scan_response["LastEvaluatedKey"]["username"]
+            if "LastEvaluatedKey" in scan_response:
+                if "username" in scan_response["LastEvaluatedKey"]:
+                    last_username = scan_response["LastEvaluatedKey"]["username"]
             new_response = {
                 "users": users,
                 "last_username": last_username
