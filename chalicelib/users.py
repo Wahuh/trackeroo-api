@@ -5,6 +5,10 @@ def add_user(username):
     return User.add_one(username)
 
 
+def get_user(username):
+    return User.get_user(username)
+
+
 def get_users(start_username):
     return User.scan_users(start_username)
 
