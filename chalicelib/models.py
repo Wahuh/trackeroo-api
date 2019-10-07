@@ -34,6 +34,23 @@ class User:
     #         'age': age,
     #         'height': height,
     #         'weight': weight,
+    @staticmethod
+    def add_follower(username, follower):
+        try:
+            patch_user_response = _users_table.update_item(
+                TableName='users',
+                Key={
+                    'username': username
+                },
+                UpdateExpression="SET followers = list_append(followers, :followers)",
+                ExpressionAttributeValues={
+                    ':followers': [follower]
+                },
+                ReturnValues="ALL_NEW"
+            )
+            return patch_user_response
+        except Exception as e:
+            raise e
             
 
     @staticmethod
