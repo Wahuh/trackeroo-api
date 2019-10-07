@@ -17,6 +17,7 @@ from chalicelib.users import (
 )
 import json
 from chalicelib.models import Connection
+from chalicelib.connections import handle_connection
 
 app = Chalice(app_name="trackeroo-api")
 app.experimental_feature_flags.update(["WEBSOCKETS"])
@@ -194,13 +195,16 @@ def follower(username):
 
 @app.on_ws_message()
 def handle_message(event):
+    connection_id = event.connection_id
     try:
-        # message_type = event.json_body["type"]
-        username = event.json_body["username"]
-        app.websocket_api.send(
-            event.connection_id, json.dumps({"username": username})
-        )
-    except WebsocketDisconnectedError as e:
+        message_type = event.json_body["type"]
+        if message_type == "connect":
+            username = event.json_body["username"]
+            handle_connection(username, connection_id)
+        # app.websocket_api.send(
+        # event.connection_id, json.dumps({"username": username})
+        # )
+    except WebsocketDisconnectedError:
         pass
 
 
@@ -209,10 +213,10 @@ def handle_message(event):
 #     print(5)
 
 
-@app.lambda_function(name="runs_stream_handler")
-def push_runs(event, context):
+# @app.lambda_function(name="runs_stream_handler")
+# def push_runs(event, context):
 
-    print(event)
+#     print(event)
 
 
 # @app.route('/connections', methods=["POST", "PATCH"])
