@@ -25,12 +25,24 @@ class User:
             'last_name': last_name,
             'age': age,
             'height': height,
-            'weight': weight
+            'weight': weight,
+            'cumulative_distance': 0
         }
         try:
             put_user_response = dynamodb_resource.Table('users').put_item(Item=new_user_item)
             print(put_user_response, f'new user inserted {new_user_item}')
             return new_user_item
+        except Exception as e:
+            raise e
+
+    @staticmethod
+    def scan_users():
+        try:
+            scan_response = dynamodb_client.scan(
+                TableName='users',
+                Limit=10
+            )
+            return scan_response
         except Exception as e:
             raise e
 
@@ -120,7 +132,6 @@ class Followers:
             )
             return patch_follower_response
         except Exception as e:
-            print(e)
             raise e
 
 
