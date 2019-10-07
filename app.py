@@ -7,8 +7,6 @@ from chalice import (
     WebsocketDisconnectedError,
 )
 from chalicelib.auth import signup, authorizer, login
-from chalicelib.users import connect
-from chalicelib.runs import add_run
 import json
 
 app = Chalice(app_name="trackeroo-api")
