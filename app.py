@@ -8,10 +8,11 @@ from chalice import (
 )
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run
-from chalicelib.users import add_user, get_users
+from chalicelib.users import add_user, get_users, add_follower
 from chalicelib.followers import add_first_follower, update_followers
 from chalicelib.subscriptions import add_first_subscription, update_subscriptions
 import json
+from chalicelib.models import Connection
 
 app = Chalice(app_name="trackeroo-api")
 app.experimental_feature_flags.update(["WEBSOCKETS"])
@@ -86,7 +87,7 @@ def patch_run():
         finish_time = body["finish_time"]
         average_speed = body["average_speed"]
         total_distance = body["total_distance"]
-        run = update_run(run_id, username, finish_time, average_speed, total_distance)
+        update_run(run_id, username, finish_time, average_speed, total_distance)
         return Response(
             body={},
             status_code=204
@@ -137,6 +138,22 @@ def post_user():
         raise ChaliceViewError(e)
 
 
+@app.route("/users/{username}/followers", cors=True, methods=["PATCH"])
+def patch_user_followers(username):
+    try:
+        body = app.current_request.json_body
+        follower = body["follower"]
+        add_follower(username, follower)
+        return Response(
+            body={},
+            status_code=204
+        )
+    except KeyError:
+        raise BadRequestError("username and start_time must be valid")
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
 @app.route("/users/{username}/subscriptions", cors=True, methods=["PATCH"])
 def patch_subscription(username):
     try:
@@ -175,20 +192,6 @@ def follower(username):
     except Exception as e:
         raise ChaliceViewError(e)
 
-
-@app.route("/users/{username}/followers", cors=True, methods=["PATCH"])
-def follower(username):
-    try:
-        body = app.current_request.json_body
-        follower = body["follower"]
-        print(follower, username)
-        followers = update_followers(username, follower)
-        return Response(
-            body={"followers": followers},
-            status_code=200,
-        )
-    except Exception as e:
-        raise ChaliceViewError(e)
 # @app.on_ws_connect()
 # def handle_connect(event):
 #     event.connection_id
@@ -215,3 +218,22 @@ def handle_message(event):
 # @app.lambda_function(name="runs_stream_handler")
 # def push_runs(event, context):
 #     print(event)
+
+# @app.route('/connections', methods=["POST", "PATCH"])
+# def connections():
+#     method = app.current_request.method
+#     if method == "POST":
+#         try:
+#             body = app.current_request.json_body
+#             username = body["username"]
+#             Connection.add_one(username)
+#         except Exception as e:
+#             raise ChaliceViewError(e)
+#     elif method == "PATCH":
+#         try:
+#             body = app.current_request.json_body
+#             username = body["username"]
+#             Connection.remove_connection_id(username)
+#         except Exception as e:
+#             raise ChaliceViewError(e)
+
