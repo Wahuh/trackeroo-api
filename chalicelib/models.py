@@ -9,12 +9,6 @@ _runs_table = connection.Table("runs")
 _followers_table = connection.Table("followers")
 _subscriptions_table = connection.Table("subscriptions")
 
-print('**************************************************')
-
-# print(boto3.client('dynamodb').list_tables())
-dynamodb_resource = boto3.resource("dynamodb")
-dynamodb_client = boto3.client("dynamodb")
-
 
 class User:
     @staticmethod
@@ -29,7 +23,7 @@ class User:
             'cumulative_distance': 0
         }
         try:
-            put_user_response = dynamodb_resource.Table('users').put_item(Item=new_user_item)
+            put_user_response = _users_table.put_item(Item=new_user_item)
             print(put_user_response, f'new user inserted {new_user_item}')
             return new_user_item
         except Exception as e:
@@ -38,12 +32,21 @@ class User:
     @staticmethod
     def scan_users():
         try:
-            scan_response = dynamodb_client.scan(
+            scan_response = _users_table.scan(
                 TableName='users',
                 Limit=10
             )
-            return scan_response
+            users = scan_response["Items"]
+            last_username = None
+            if "username" in scan_response["LastEvaluatedKey"]:
+                last_username = scan_response["LastEvaluatedKey"]["username"]
+            new_response = {
+                "users": users,
+                "last_username": last_username
+            }
+            return new_response
         except Exception as e:
+            print(e)
             raise e
 
 
@@ -60,8 +63,7 @@ class Run:
             'start_time': start_time
         }
         try:
-            # put_run_response = _runs_table.put_item(Item=new_run_item)
-            put_run_response = dynamodb_resource.Table("runs").put_item(Item=new_run_item)
+            put_run_response = _runs_table.put_item(Item=new_run_item)
             print(put_run_response, f'run inserted {new_run_item}')
             return new_run_item
         except Exception as e:
