@@ -21,19 +21,11 @@ class User:
             'subscriptions': []
         }
         try:
-            put_user_response = _users_table.put_item(Item=new_user_item)
-            print(put_user_response, f'new user inserted {new_user_item}')
+            _users_table.put_item(Item=new_user_item)
             return new_user_item
         except Exception as e:
             raise e
-    
-    # @staticmethod
-    # def update_one(username, first_name, last_name, age, height, weight):
-    #         'first_name': first_name,
-    #         'last_name': last_name,
-    #         'age': age,
-    #         'height': height,
-    #         'weight': weight,
+
     @staticmethod
     def add_follower(username, follower):
         try:
@@ -100,6 +92,26 @@ class User:
         except Exception as e:
             raise e
 
+    @staticmethod
+    def get_user(username):
+        try:
+            get_response = _users_table.get_item(
+                Key={
+                    "username": username
+                }
+            )
+            return get_response["Item"]
+        except Exception as e:
+            raise e
+           
+    # @staticmethod
+    # def update_one(username, first_name, last_name, age, height, weight):
+    #         'first_name': first_name,
+    #         'last_name': last_name,
+    #         'age': age,
+    #         'height': height,
+    #         'weight': weight,
+
 
 class Run:
     @staticmethod
@@ -114,8 +126,7 @@ class Run:
             'start_time': start_time
         }
         try:
-            put_run_response = _runs_table.put_item(Item=new_run_item)
-            print(put_run_response, f'run inserted {new_run_item}')
+            _runs_table.put_item(Item=new_run_item)
             return new_run_item
         except Exception as e:
             raise e
@@ -137,13 +148,27 @@ class Run:
                 },
                 ReturnValues="ALL_NEW"
             )
-            print(patch_run_response)
             return patch_run_response
         except Exception as e:
             raise e
 
-    # @staticmethod
-    # def get_runs_by_subscriptions()
+    @staticmethod
+    def get_runs_by_subscriptions(subscriptions):
+        try:
+            scan_response = _runs_table.scan(
+                IndexName='username-start_time-index',
+                ScanFilter={
+                    'username': {
+                        "AttributeValueList": subscriptions,
+                        "ComparisonOperator": "IN"
+                    }
+                }
+            )
+            runs = scan_response["Items"]
+            sorted_runs = sorted(runs, key=lambda run: run["start_time"])
+            return sorted_runs
+        except Exception as e:
+            raise e
 
 
 class Followers:
@@ -157,8 +182,7 @@ class Followers:
             'followers': [follower]
         }
         try:
-            put_followers_response = _followers_table.put_item(Item=new_follower_item)
-            print(put_followers_response, f'inserted new follower: {new_follower_item}')
+            _followers_table.put_item(Item=new_follower_item)
             return new_follower_item
         except Exception as e:
             raise e
@@ -177,7 +201,6 @@ class Followers:
                 },
                 ReturnValues="ALL_NEW"
             )
-            print(patch_follower_response)
             return patch_follower_response
         except Exception as e:
             raise e
@@ -194,8 +217,7 @@ class Subscriptions:
             'subscriptions': [subscription]
         }
         try:
-            put_subscription_response = dynamodb_resource.Table('subscriptions').put_item(Item=new_subscription_item)
-            print(put_subscription_response, f'inserted new subscription {new_subscription_item}')
+            _subscriptions_table.put_item(Item=new_subscription_item)
             return new_subscription_item
         except Exception as e:
             raise e
@@ -206,7 +228,7 @@ class Subscriptions:
         subscription
     ):
         try:
-            patch_subscription_response = dynamodb_client.update_item(
+            patch_subscription_response = _subscriptions_table.update_item(
                 TableName='subscriptions',
                 Key={
                     'username': {
