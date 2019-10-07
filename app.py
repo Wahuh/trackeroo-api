@@ -8,7 +8,13 @@ from chalice import (
 )
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run, get_runs_by_subscriptions
-from chalicelib.users import add_user, get_users, add_follower, add_subscription, get_user
+from chalicelib.users import (
+    add_user,
+    get_users,
+    add_follower,
+    add_subscription,
+    get_user,
+)
 import json
 from chalicelib.models import Connection
 
@@ -30,7 +36,7 @@ def post_signup():
         username = body["username"]
         jwt = signup(username=username, password=password)
         return Response(
-            body={"message": "Registration success"},
+            body={"username": username},
             status_code=200,
             headers={"Authorization": jwt},
         )
@@ -48,7 +54,7 @@ def post_login():
         username = body["username"]
         jwt = login(username=username, password=password)
         return Response(
-            body={"message": "Login success"},
+            body={"username": username},
             status_code=200,
             headers={"Authorization": jwt},
         )
@@ -65,10 +71,7 @@ def post_run():
         username = body["username"]
         start_time = body["start_time"]
         run = add_run(username, start_time)
-        return Response(
-            body={"run": run},
-            status_code=201,
-        )
+        return Response(body={"run": run}, status_code=201)
     except KeyError:
         raise BadRequestError("Bad request body")
     except Exception as e:
@@ -84,11 +87,10 @@ def patch_run():
         finish_time = body["finish_time"]
         average_speed = body["average_speed"]
         total_distance = body["total_distance"]
-        update_run(run_id, username, finish_time, average_speed, total_distance)
-        return Response(
-            body={},
-            status_code=204
+        update_run(
+            run_id, username, finish_time, average_speed, total_distance
         )
+        return Response(body={}, status_code=204)
     except KeyError:
         raise BadRequestError("Bad request body")
     except Exception as e:
@@ -104,10 +106,7 @@ def get_runs():
             user = get_user(username)
             print(user)
             runs = get_runs_by_subscriptions(user["subscriptions"])
-            return Response(
-                body={"runs": runs},
-                status_code=200
-            )
+            return Response(body={"runs": runs}, status_code=200)
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -120,10 +119,7 @@ def fetch_users():
         if "start_username" in query:
             start_username = query["start_username"]
         users = get_users(start_username)
-        return Response(
-            body=users,
-            status_code=200
-        )
+        return Response(body=users, status_code=200)
     except Exception as e:
         raise e
 
@@ -134,10 +130,7 @@ def post_user():
         body = app.current_request.json_body
         username = body["username"]
         user = add_user(username)
-        return Response(
-            body={"user": user},
-            status_code=201
-        )
+        return Response(body={"user": user}, status_code=201)
     except KeyError:
         raise BadRequestError("username must be valid")
     except Exception as e:
@@ -150,10 +143,7 @@ def patch_user_followers(username):
         body = app.current_request.json_body
         follower = body["follower"]
         add_follower(username, follower)
-        return Response(
-            body={},
-            status_code=204
-        )
+        return Response(body={}, status_code=204)
     except KeyError:
         raise BadRequestError("follower must be valid")
     except Exception as e:
@@ -166,10 +156,7 @@ def patch_subscription(username):
         body = app.current_request.json_body
         subscription = body["subscription"]
         add_subscription(username, subscription)
-        return Response(
-            body={},
-            status_code=204
-        )
+        return Response(body={}, status_code=204)
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -194,12 +181,10 @@ def follower(username):
         body = app.current_request.json_body
         follower = body["follower"]
         followers = add_first_follower(username, follower)
-        return Response(
-            body={"user": followers},
-            status_code=201,
-        )
+        return Response(body={"user": followers}, status_code=201)
     except Exception as e:
         raise ChaliceViewError(e)
+
 
 # @app.on_ws_connect()
 # def handle_connect(event):
@@ -224,9 +209,11 @@ def handle_message(event):
 #     print(5)
 
 
-# @app.lambda_function(name="runs_stream_handler")
-# def push_runs(event, context):
-#     print(event)
+@app.lambda_function(name="runs_stream_handler")
+def push_runs(event, context):
+
+    print(event)
+
 
 # @app.route('/connections', methods=["POST", "PATCH"])
 # def connections():
@@ -245,4 +232,3 @@ def handle_message(event):
 #             Connection.remove_connection_id(username)
 #         except Exception as e:
 #             raise ChaliceViewError(e)
-
