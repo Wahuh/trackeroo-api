@@ -85,13 +85,11 @@ def patch_run():
         username = body["username"]
         finish_time = body["finish_time"]
         average_speed = body["average_speed"]
-        altitude = body["altitude"]
         total_distance = body["total_distance"]
-        time_taken = body["time_taken"]
-        run = update_run(run_id, username, finish_time, average_speed, altitude, total_distance, time_taken)
+        run = update_run(run_id, username, finish_time, average_speed, total_distance)
         return Response(
-            body={"run": run},
-            status_code=200
+            body={},
+            status_code=204
         )
     except KeyError:
         raise BadRequestError("Bad request body")
@@ -134,9 +132,6 @@ def post_user():
             status_code=201
         )
     except KeyError:
-        raise BadRequestError("Required key-value is missing")
-        add_run(username=username, start_time=start_time)
-    except KeyError:
         raise BadRequestError("username and start_time must be valid")
     except Exception as e:
         raise ChaliceViewError(e)
@@ -174,7 +169,7 @@ def follower(username):
         follower = body["follower"]
         followers = add_first_follower(username, follower)
         return Response(
-            body={"followers": followers},
+            body={"user": followers},
             status_code=201,
         )
     except Exception as e:
