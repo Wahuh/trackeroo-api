@@ -86,6 +86,7 @@ Create a directory called `.chalice` then inside of it create a `config.json` fi
 ```
 
 In the same directory, create a `policy-dev.json` file which looks like:
+
 ```
 {
   "Version": "2012-10-17",
@@ -98,7 +99,11 @@ In the same directory, create a `policy-dev.json` file which looks like:
         "cognito-sync:*",
         "iam:ListRoles",
         "iam:ListOpenIdConnectProviders",
-        "sns:ListPlatformApplications"
+        "sns:ListPlatformApplications",
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:ListStreams"
       ],
       "Resource": "*"
     }

@@ -1,11 +1,21 @@
-from chalice import Chalice, Response, BadRequestError, ChaliceViewError
+from boto3.session import Session
+from chalice import (
+    Chalice,
+    Response,
+    BadRequestError,
+    ChaliceViewError,
+    WebsocketDisconnectedError,
+)
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run
 from chalicelib.users import add_user, get_users
 from chalicelib.followers import add_first_follower, update_followers
 from chalicelib.subscriptions import add_first_subscription, update_subscriptions
+import json
 
 app = Chalice(app_name="trackeroo-api")
+app.experimental_feature_flags.update(["WEBSOCKETS"])
+app.websocket_api.session = Session()
 
 
 @app.route("/", cors=True, methods=["GET"], authorizer=authorizer)
@@ -118,6 +128,9 @@ def post_user():
         )
     except KeyError:
         raise BadRequestError("Required key-value is missing")
+        add_run(username=username, start_time=start_time)
+    except KeyError:
+        raise BadRequestError("username and start_time must be valid")
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -174,3 +187,29 @@ def follower(username):
         )
     except Exception as e:
         raise ChaliceViewError(e)
+# @app.on_ws_connect()
+# def handle_connect(event):
+#     event.connection_id
+#     # get username
+
+
+@app.on_ws_message()
+def handle_message(event):
+    try:
+        # message_type = event.json_body["type"]
+        username = event.json_body["username"]
+        app.websocket_api.send(
+            event.connection_id, json.dumps({"username": username})
+        )
+    except WebsocketDisconnectedError as e:
+        pass
+
+
+# @app.on_ws_disconnect()
+# def handle_disconnect():
+#     print(5)
+
+
+# @app.lambda_function(name="runs_stream_handler")
+# def push_runs(event, context):
+#     print(event)
