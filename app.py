@@ -104,7 +104,7 @@ def fetch_users():
     try:
         users = get_users()
         return Response(
-            body={"users": users},
+            body=users,
             status_code=200
         )
     except Exception as e:
