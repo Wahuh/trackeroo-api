@@ -8,9 +8,7 @@ from chalice import (
 )
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run
-from chalicelib.users import add_user, get_users, add_follower
-from chalicelib.followers import add_first_follower, update_followers
-from chalicelib.subscriptions import add_first_subscription, update_subscriptions
+from chalicelib.users import add_user, get_users, add_follower, add_subscription
 import json
 from chalicelib.models import Connection
 
@@ -122,18 +120,13 @@ def post_user():
     try:
         body = app.current_request.json_body
         username = body["username"]
-        first_name = body["first_name"]
-        last_name = body["last_name"]
-        age = body["age"]
-        height = body["height"]
-        weight = body["weight"]
-        user = add_user(username, first_name, last_name, age, height, weight)
+        user = add_user(username)
         return Response(
             body={"user": user},
             status_code=201
         )
     except KeyError:
-        raise BadRequestError("username and start_time must be valid")
+        raise BadRequestError("username must be valid")
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -149,7 +142,7 @@ def patch_user_followers(username):
             status_code=204
         )
     except KeyError:
-        raise BadRequestError("username and start_time must be valid")
+        raise BadRequestError("follower must be valid")
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -159,24 +152,27 @@ def patch_subscription(username):
     try:
         body = app.current_request.json_body
         subscription = body["subscription"]
-        subscriptions = update_subscriptions(username, subscription)
-        return {"subscriptions": subscriptions}
-    except Exception as e:
-        raise ChaliceViewError(e)
-
-
-@app.route("/users/{username}/subscriptions", cors=True, methods=["POST"])
-def post_subscription(username):
-    try:
-        body = app.current_request.json_body
-        subscription = body["subscription"]
-        subscription = add_first_subscription(username, subscription)
+        add_subscription(username, subscription)
         return Response(
-            body={"subscription": subscription},
-            status_code=201,
+            body={},
+            status_code=204
         )
     except Exception as e:
         raise ChaliceViewError(e)
+
+
+# @app.route("/users/{username}/subscriptions", cors=True, methods=["POST"])
+# def post_subscription(username):
+#     try:
+#         body = app.current_request.json_body
+#         subscription = body["subscription"]
+#         subscription = add_first_subscription(username, subscription)
+#         return Response(
+#             body={"subscription": subscription},
+#             status_code=201,
+#         )
+#     except Exception as e:
+#         raise ChaliceViewError(e)
 
 
 @app.route("/users/{username}/followers", cors=True, methods=["POST"])
