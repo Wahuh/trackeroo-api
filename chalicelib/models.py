@@ -308,3 +308,38 @@ class Connection:
             return updated_connection_response
         except Exception as e:
             raise e
+
+# NEEDS TESTING vvv
+    @staticmethod
+    def get_connection_ids_for_subscriptions(subscriptions):
+        try:
+            scan_response = _connections_table.scan(
+                ScanFilter={
+                    'username': {
+                        "AttributeValueList": subscriptions,
+                        "ComparisonOperator": "IN"
+                    }
+                }
+            )
+            return scan_response["Items"]
+        except Exception as e:
+            raise e
+
+    @staticmethod
+    def get_user_by_connection_id_and_remove_id(connection_id):
+        try:
+            scan_response = _connections_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr("connection_id").eq(connection_id),
+            )
+            username = scan_response["Items"][0]["username"]
+            remove_connection_response = _connections_table.update_item(
+                TableName="connections",
+                Key={
+                    'username': username
+                },
+                UpdateExpression="REMOVE connection_id",
+                ReturnValues="ALL_NEW"
+            )
+            return remove_connection_response
+        except Exception as e:
+            raise e
