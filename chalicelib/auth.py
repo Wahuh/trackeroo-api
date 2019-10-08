@@ -51,6 +51,4 @@ def signup(username, password):
     ]
     User.add_one(username=username)
     Connection.add_one(username=username)
-    Followers.add_one(username=username)
-    Subscriptions.add_one(username=username)
     return id_token
