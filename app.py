@@ -19,6 +19,7 @@ import json
 from chalicelib.models import Connection
 from chalicelib.connections import handle_connection
 import jwt
+from dynamodb_json import json_util
 
 app = Chalice(app_name="trackeroo-api")
 app.experimental_feature_flags.update(["WEBSOCKETS"])
@@ -90,6 +91,7 @@ def post_run():
     except KeyError:
         raise BadRequestError("Bad request body")
     except Exception as e:
+        print(e)
         raise ChaliceViewError(e)
 
 
@@ -211,19 +213,19 @@ def follower(username):
 # def handle_connect(event):
 
 
-# @app.on_ws_message()
-# def handle_message(event):
-#     connection_id = event.connection_id
-#     try:
-#         message_type = event.json_body["type"]
-#         if message_type == "connect":
-#             username = event.json_body["username"]
-#             handle_connection(username, connection_id)
-#         # app.websocket_api.send(
-#         # event.connection_id, json.dumps({"username": username})
-#         # )
-#     except WebsocketDisconnectedError:
-#         pass
+@app.on_ws_message()
+def handle_message(event):
+    connection_id = event.connection_id
+    try:
+        message_type = event.json_body["type"]
+        if message_type == "connect":
+            username = event.json_body["username"]
+            handle_connection(username, connection_id)
+        # app.websocket_api.send(
+        # event.connection_id, json.dumps({"username": username})
+        # )
+    except WebsocketDisconnectedError:
+        pass
 
 
 # @app.on_ws_disconnect()
@@ -231,12 +233,23 @@ def follower(username):
 #     print(5)
 
 
-# @app.lambda_function(name="runs_stream_handler")
-# def push_runs(event, context):
-#     print(event)
-# #get connection_id
-# user = get_user(username)
-# #batch get connection_ids
+@app.lambda_function(name="runs_stream_handler")
+def push_runs(event, context):
+    if "Records" in event:
+        records = event["Records"]
+        for record in records:
+            event_name = record["eventName"]
+            if event_name == "INSERT":
+                print(record)
+                run = record["dynamodb"]["NewImage"]
+                print(run)
+                converted = json_util.loads(run)
+                print(converted)
+
+
+#     #get connection_id
+#     user = get_user(username)
+#     #batch get connection_ids
 # for follower in user.followers:
 #     connection_id =
 #      # app.websocket_api.send(
