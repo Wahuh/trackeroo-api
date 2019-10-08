@@ -120,9 +120,11 @@ def get_runs():
             if "username" in query:
                 username = query["username"]
                 user = get_user(username)
-                print(user)
-                runs = get_runs_by_subscriptions(user["subscriptions"])
-                return Response(body={"runs": runs}, status_code=200)
+                if user["subscriptions"]:
+                    runs = get_runs_by_subscriptions(user["subscriptions"])
+                    return Response(body={"runs": runs}, status_code=200)
+                else:
+                    return Response(body={"runs": []}, status_code=200)
     except Exception as e:
         raise ChaliceViewError(e)
 
