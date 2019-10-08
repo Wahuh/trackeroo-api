@@ -180,6 +180,16 @@ class Run:
         except Exception as e:
             raise e
 
+    @staticmethod
+    def get_users_runs(username):
+        try:
+            scan_response = _runs_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr("username").eq(username),
+            )
+            return scan_response["Items"]
+        except Exception as e:
+            raise e
+
 
 class Followers:
     @staticmethod
