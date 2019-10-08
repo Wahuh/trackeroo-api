@@ -18,6 +18,7 @@ from chalicelib.users import (
 import json
 from chalicelib.models import Connection
 from chalicelib.connections import handle_connection
+import jwt
 
 app = Chalice(app_name="trackeroo-api")
 app.experimental_feature_flags.update(["WEBSOCKETS"])
@@ -27,6 +28,18 @@ app.websocket_api.session = Session()
 @app.route("/", cors=True, methods=["GET"], authorizer=authorizer)
 def index():
     return {"hello": "world"}
+
+
+@app.route("/me", cors=True, methods=["GET"])
+def get_me():
+    try:
+        token = app.current_request.headers["Authorization"]
+        print(token)
+        details = jwt.decode(token, algorithms=["RS256"])
+        user = get_user(details["username"])
+        return Response(body={"user": user}, status_code=200)
+    except Exception as e:
+        raise ChaliceViewError(e)
 
 
 @app.route("/signup", cors=True, methods=["POST"])
@@ -44,6 +57,7 @@ def post_signup():
     except KeyError:
         raise BadRequestError("Username or password is missing")
     except Exception as e:
+        print(e)
         raise ChaliceViewError(e)
 
 
@@ -185,7 +199,7 @@ def follower(username):
     try:
         body = app.current_request.json_body
         follower = body["follower"]
-        followers = add_first_follower(username, follower)
+        followers = add_follower(username, follower)
         return Response(body={"user": followers}, status_code=201)
     except Exception as e:
         raise ChaliceViewError(e)
@@ -195,19 +209,19 @@ def follower(username):
 # def handle_connect(event):
 
 
-@app.on_ws_message()
-def handle_message(event):
-    connection_id = event.connection_id
-    try:
-        message_type = event.json_body["type"]
-        if message_type == "connect":
-            username = event.json_body["username"]
-            handle_connection(username, connection_id)
-        # app.websocket_api.send(
-        # event.connection_id, json.dumps({"username": username})
-        # )
-    except WebsocketDisconnectedError:
-        pass
+# @app.on_ws_message()
+# def handle_message(event):
+#     connection_id = event.connection_id
+#     try:
+#         message_type = event.json_body["type"]
+#         if message_type == "connect":
+#             username = event.json_body["username"]
+#             handle_connection(username, connection_id)
+#         # app.websocket_api.send(
+#         # event.connection_id, json.dumps({"username": username})
+#         # )
+#     except WebsocketDisconnectedError:
+#         pass
 
 
 # @app.on_ws_disconnect()
@@ -215,24 +229,24 @@ def handle_message(event):
 #     print(5)
 
 
-@app.lambda_function(name="runs_stream_handler")
-def push_runs(event, context):
-    print(event)
-    # #get connection_id
-    # user = get_user(username)
-    # #batch get connection_ids
-    # for follower in user.followers:
-    #     connection_id =
-    #      # app.websocket_api.send(
-    #     # event.connection_id, json.dumps({"username": username})
-    #     # )
-    # event.connection_id
-    # # get username
-    # get username from run
-    # if insert
+# @app.lambda_function(name="runs_stream_handler")
+# def push_runs(event, context):
+#     print(event)
+# #get connection_id
+# user = get_user(username)
+# #batch get connection_ids
+# for follower in user.followers:
+#     connection_id =
+#      # app.websocket_api.send(
+#     # event.connection_id, json.dumps({"username": username})
+#     # )
+# event.connection_id
+# # get username
+# get username from run
+# if insert
 
-    # if modify
-    # print(event)
+# if modify
+# print(event)
 
 
 # @app.route('/connections', methods=["POST", "PATCH"])
