@@ -44,7 +44,6 @@ class User:
         except Exception as e:
             raise e
 
-
     @staticmethod
     def add_subscription(username, subscription):
         try:
@@ -62,7 +61,6 @@ class User:
             return patch_user_response
         except Exception as e:
             raise e
-            
 
     @staticmethod
     def scan_users(start_username=None):
@@ -70,7 +68,6 @@ class User:
             scan_response = None
             if start_username:
                 scan_response = _users_table.scan(
-                    TableName='users',
                     Limit=10,
                     ExclusiveStartKey={"username": start_username}
                 )
@@ -103,14 +100,6 @@ class User:
             return get_response["Item"]
         except Exception as e:
             raise e
-           
-    # @staticmethod
-    # def update_one(username, first_name, last_name, age, height, weight):
-    #         'first_name': first_name,
-    #         'last_name': last_name,
-    #         'age': age,
-    #         'height': height,
-    #         'weight': weight,
 
 
 class Run:
@@ -132,7 +121,7 @@ class Run:
             raise e
 
     @staticmethod
-    def update_one(run_id, username, finish_time, average_speed, total_distance):
+    def update_one(run_id, username, finish_time, average_speed, total_distance, coordinates):
         try:
             patch_run_response = _runs_table.update_item(
                 TableName='runs',
@@ -140,14 +129,16 @@ class Run:
                     'username': username,
                     'run_id': run_id
                 },
-                UpdateExpression='SET finish_time=:finish, average_speed=:average, total_distance=:distance',
+                UpdateExpression='SET finish_time=:finish, average_speed=:average, total_distance=:distance, coordinates=:coordinates',
                 ExpressionAttributeValues={
                     ':finish': {"S": finish_time},
                     ':average': {"N": average_speed},
                     ':distance': {"N": total_distance},
+                    ':coordinates': {"S": coordinates}
                 },
                 ReturnValues="ALL_NEW"
             )
+            print(patch_run_response)
             return patch_run_response
         except Exception as e:
             raise e
@@ -255,7 +246,7 @@ class Connection:
             return put_connection_response
         except Exception as e:
             raise e
-    
+
     @staticmethod
     def add_connection_id(username, connection_id):
         try:
@@ -273,7 +264,7 @@ class Connection:
             return updated_connection_response
         except Exception as e:
             raise e
-    
+
     @staticmethod
     def remove_connection_id(username):
         try:
@@ -288,4 +279,3 @@ class Connection:
             return updated_connection_response
         except Exception as e:
             raise e
-    
