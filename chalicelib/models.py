@@ -101,6 +101,25 @@ class User:
         except Exception as e:
             raise e
 
+    @staticmethod
+    def update_one(username, distance):
+        try:
+            distance_decimal = Decimal(distance)
+            update_response = _users_table.update_item(
+                Key={
+                    'username': username
+                },
+                UpdateExpression="SET cumulative_distance = cumulative_distance + :distance",
+                ExpressionAttributeValues={
+                    ":distance": distance_decimal
+                },
+                ReturnValues="ALL_NEW"
+            )
+            print(update_response)
+            return update_response
+        except Exception as e:
+            raise e
+
 
 class Run:
     @staticmethod

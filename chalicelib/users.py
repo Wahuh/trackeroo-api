@@ -19,3 +19,7 @@ def add_follower(username, follower):
 
 def add_subscription(username, subscription):
     return User.add_subscription(username, subscription)
+
+
+def update_user_distance(username, distance):
+    return User.update_one(username, distance)
