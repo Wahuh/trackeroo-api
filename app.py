@@ -102,12 +102,13 @@ def patch_run():
 def get_runs():
     try:
         query = app.current_request.query_params
-        if "username" in query:
-            username = query["username"]
-            user = get_user(username)
-            print(user)
-            runs = get_runs_by_subscriptions(user["subscriptions"])
-            return Response(body={"runs": runs}, status_code=200)
+        if query:
+            if "username" in query:
+                username = query["username"]
+                user = get_user(username)
+                print(user)
+                runs = get_runs_by_subscriptions(user["subscriptions"])
+                return Response(body={"runs": runs}, status_code=200)
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -117,8 +118,11 @@ def fetch_users():
     try:
         query = app.current_request.query_params
         start_username = None
-        if "start_username" in query:
-            start_username = query["start_username"]
+
+        if query:
+            if "start_username" in query:
+                start_username = query["start_username"]
+
         users = get_users(start_username)
         return Response(body=users, status_code=200)
     except Exception as e:
@@ -189,8 +193,6 @@ def follower(username):
 
 # @app.on_ws_connect()
 # def handle_connect(event):
-#     event.connection_id
-#     # get username
 
 
 @app.on_ws_message()
@@ -213,10 +215,24 @@ def handle_message(event):
 #     print(5)
 
 
-# @app.lambda_function(name="runs_stream_handler")
-# def push_runs(event, context):
+@app.lambda_function(name="runs_stream_handler")
+def push_runs(event, context):
+    print(event)
+    # #get connection_id
+    # user = get_user(username)
+    # #batch get connection_ids
+    # for follower in user.followers:
+    #     connection_id =
+    #      # app.websocket_api.send(
+    #     # event.connection_id, json.dumps({"username": username})
+    #     # )
+    # event.connection_id
+    # # get username
+    # get username from run
+    # if insert
 
-#     print(event)
+    # if modify
+    # print(event)
 
 
 # @app.route('/connections', methods=["POST", "PATCH"])
