@@ -1,3 +1,4 @@
+import boto3
 from boto3.session import Session
 from chalice import (
     Chalice,
@@ -14,10 +15,15 @@ from chalicelib.users import (
     add_follower,
     add_subscription,
     get_user,
+    get_all_followers_connection_ids,
 )
 import json
 from chalicelib.models import Connection
-from chalicelib.connections import handle_connection
+from chalicelib.connections import (
+    handle_connection,
+    handle_disconnection,
+    get_connection_id,
+)
 import jwt
 from dynamodb_json import json_util
 
@@ -209,8 +215,13 @@ def follower(username):
         raise ChaliceViewError(e)
 
 
-# @app.on_ws_connect()
-# def handle_connect(event):
+# @app.on_ws_disconnect()
+# def disconnect(event):
+#     connection_id = event.connection_id
+#     try:
+#         handle_disconnection()
+#     except Exception:
+#         pass
 
 
 @app.on_ws_message()
@@ -231,37 +242,8 @@ def handle_message(event):
 # @app.on_ws_disconnect()
 # def handle_disconnect():
 #     print(5)
-
-
-@app.lambda_function(name="runs_stream_handler")
-def push_runs(event, context):
-    if "Records" in event:
-        records = event["Records"]
-        for record in records:
-            event_name = record["eventName"]
-            if event_name == "INSERT":
-                print(record)
-                run = record["dynamodb"]["NewImage"]
-                print(run)
-                converted = json_util.loads(run)
-                print(converted)
-
-
-#     #get connection_id
-#     user = get_user(username)
-#     #batch get connection_ids
-# for follower in user.followers:
-#     connection_id =
-#      # app.websocket_api.send(
-#     # event.connection_id, json.dumps({"username": username})
-#     # )
-# event.connection_id
-# # get username
-# get username from run
-# if insert
-
-# if modify
-# print(event)
+# region_name = os.environ.get("REGION_NAME")
+# client = boto3.client("apigatewaymanagementapi", region_name=region_name, endpoint_url=)
 
 
 # @app.route('/connections', methods=["POST", "PATCH"])
@@ -281,3 +263,5 @@ def push_runs(event, context):
 #             Connection.remove_connection_id(username)
 #         except Exception as e:
 #             raise ChaliceViewError(e)
+
+# wait 5 mins between deletes and deploys because CloudFront caches 500 errors
