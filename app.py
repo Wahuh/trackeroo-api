@@ -176,6 +176,18 @@ def update_user(username):
         raise e
 
 
+@app.route('/users/{username}', cors=True, methods=["GET"])
+def get_user_item(username):
+    try:
+        user = get_user(username)
+        return Response(
+            body={'user': user},
+            status_code=200
+        )
+    except Exception as e:
+        raise e
+
+
 @app.route("/users/{username}/followers", cors=True, methods=["PATCH"])
 def patch_user_followers(username):
     try:

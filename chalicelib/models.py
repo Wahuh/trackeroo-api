@@ -122,7 +122,7 @@ class User:
             return update_response
         except Exception as e:
             raise e
-    
+
     @staticmethod
     def update_rewards(username):
         try:
