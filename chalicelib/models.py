@@ -333,7 +333,7 @@ class Rewards:
                 scan_response = _rewards_table.scan(
                     FilterExpression=boto3.dynamodb.conditions.Attr("completed").eq(False)
                 )
-            return scan_response
+            return scan_response["Items"]
         except Exception as e:
             raise e
 
