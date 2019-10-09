@@ -130,7 +130,6 @@ def get_runs_by_username(username):
 def fetch_users():
     try:
         query = app.current_request.query_params
-        print(query, )
         start_username = None
         if query is None:
             users = get_users(None)
@@ -252,8 +251,11 @@ def patch_reward():
 def fetch_rewards():
     try:
         query = app.current_request.query_params
-        completed = query["completed"]
-        rewards = get_rewards(completed)
+        if query is None:
+            rewards = get_rewards(None)
+        else:
+            completed = query["completed"]
+            rewards = get_rewards(completed)
         return Response(
             body={"rewards": rewards},
             status_code=200
