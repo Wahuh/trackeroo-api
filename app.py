@@ -98,13 +98,12 @@ def patch_run():
 
 
 @app.route("/runs", methods=["GET"])
-def get_runs():
+def get_subscribers_runs():
     try:
         query = app.current_request.query_params
         if "username" in query:
             username = query["username"]
             user = get_user(username)
-            print(user)
             runs = get_runs_by_subscriptions(user["subscriptions"])
             return Response(
                 body={"runs": runs},
