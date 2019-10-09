@@ -6,9 +6,10 @@ from decimal import Decimal
 
 _users_table = connection.Table("users")
 _runs_table = connection.Table("runs")
-_followers_table = connection.Table("followers")
-_subscriptions_table = connection.Table("subscriptions")
 _connections_table = connection.Table("connections")
+_rewards_table = connection.Table("rewards")
+# _followers_table = connection.Table("followers")
+# _subscriptions_table = connection.Table("subscriptions")
 
 
 class User:
@@ -77,6 +78,7 @@ class User:
                     Limit=10
                 )
             users = scan_response["Items"]
+            print(users)
             last_username = None
             if "LastEvaluatedKey" in scan_response:
                 if "username" in scan_response["LastEvaluatedKey"]:
@@ -191,80 +193,103 @@ class Run:
             raise e
 
 
-class Followers:
+# class Followers:
+#     @staticmethod
+#     def add_one(
+#         username,
+#         follower
+#     ):
+#         new_follower_item = {
+#             'username': username,
+#             'followers': [follower]
+#         }
+#         try:
+#             _followers_table.put_item(Item=new_follower_item)
+#             return new_follower_item
+#         except Exception as e:
+#             raise e
+
+#     @staticmethod
+#     def update_one(username, follower):
+#         try:
+#             patch_follower_response = _followers_table.update_item(
+#                 TableName='followers',
+#                 Key={
+#                     'username': username
+#                 },
+#                 UpdateExpression="SET followers = list_append(followers, :followers)",
+#                 ExpressionAttributeValues={
+#                     ':followers': {"L": [{"S": follower}]},
+#                 },
+#                 ReturnValues="ALL_NEW"
+#             )
+#             return patch_follower_response
+#         except Exception as e:
+#             raise e
+
+
+# class Subscriptions:
+#     @staticmethod
+#     def add_one(
+#         username,
+#         subscription
+#     ):
+#         new_subscription_item = {
+#             'username': username,
+#             'subscriptions': [subscription]
+#         }
+#         try:
+#             _subscriptions_table.put_item(Item=new_subscription_item)
+#             return new_subscription_item
+#         except Exception as e:
+#             raise e
+
+#     @staticmethod
+#     def update_one(
+#         username,
+#         subscription
+#     ):
+#         try:
+#             patch_subscription_response = _subscriptions_table.update_item(
+#                 TableName='subscriptions',
+#                 Key={
+#                     'username': {
+#                         'S': username
+#                     }
+#                 },
+#                 UpdateExpression="SET subscriptions = list_append(subscriptions, :subscriptions)",
+#                 ExpressionAttributeValues={
+#                     ':subscriptions': {"L": [{"S": subscription}]},
+#                 },
+#                 ReturnValues="ALL_NEW"
+#             )
+#             return patch_subscription_response
+#         except Exception as e:
+#             raise e
+
+
+class Rewards:
     @staticmethod
-    def add_one(
-        username,
-        follower
-    ):
-        new_follower_item = {
-            'username': username,
-            'followers': [follower]
-        }
+    def add_one(challenge, reward):
         try:
-            _followers_table.put_item(Item=new_follower_item)
-            return new_follower_item
+            new_reward_id = str(uuid.uuid4())
+            decimal_challenge = Decimal(challenge)
+            print(new_reward_id, decimal_challenge, reward)
+            reward_item = {
+                "reward_id": new_reward_id,
+                "challenge": decimal_challenge,
+                "reward": reward
+            }
+            post_reward_response = _rewards_table.put_item(Item=reward_item)
+            print(post_reward_response)
+            return post_reward_response
         except Exception as e:
             raise e
 
-    @staticmethod
-    def update_one(username, follower):
-        try:
-            patch_follower_response = _followers_table.update_item(
-                TableName='followers',
-                Key={
-                    'username': username
-                },
-                UpdateExpression="SET followers = list_append(followers, :followers)",
-                ExpressionAttributeValues={
-                    ':followers': {"L": [{"S": follower}]},
-                },
-                ReturnValues="ALL_NEW"
-            )
-            return patch_follower_response
-        except Exception as e:
-            raise e
-
-
-class Subscriptions:
-    @staticmethod
-    def add_one(
-        username,
-        subscription
-    ):
-        new_subscription_item = {
-            'username': username,
-            'subscriptions': [subscription]
-        }
-        try:
-            _subscriptions_table.put_item(Item=new_subscription_item)
-            return new_subscription_item
-        except Exception as e:
-            raise e
-
-    @staticmethod
-    def update_one(
-        username,
-        subscription
-    ):
-        try:
-            patch_subscription_response = _subscriptions_table.update_item(
-                TableName='subscriptions',
-                Key={
-                    'username': {
-                        'S': username
-                    }
-                },
-                UpdateExpression="SET subscriptions = list_append(subscriptions, :subscriptions)",
-                ExpressionAttributeValues={
-                    ':subscriptions': {"L": [{"S": subscription}]},
-                },
-                ReturnValues="ALL_NEW"
-            )
-            return patch_subscription_response
-        except Exception as e:
-            raise e
-
+    # @staticmethod
+    # def patch_reward(reward_id, winner):
+    # @staticmethod
+    # def get_rewards(reward_id, winner):
 
 class Connection:
     @staticmethod

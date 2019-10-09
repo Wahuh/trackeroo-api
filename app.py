@@ -9,6 +9,7 @@ from chalice import (
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run, get_runs_by_subscriptions, get_users_runs
 from chalicelib.users import add_user, get_users, add_follower, add_subscription, get_user, update_user_distance
+from chalicelib.rewards import add_reward
 import json
 from chalicelib.models import Connection
 
@@ -129,10 +130,14 @@ def get_runs_by_username(username):
 def fetch_users():
     try:
         query = app.current_request.query_params
+        print(query, )
         start_username = None
-        if "start_username" in query:
+        if query is None:
+            users = get_users(None)
+        elif "start_username" in query:
             start_username = query["start_username"]
-        users = get_users(start_username)
+            users = get_users(start_username)
+        print(users)
         return Response(
             body=users,
             status_code=200
@@ -196,6 +201,21 @@ def patch_subscription(username):
         return Response(
             body={},
             status_code=204
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/rewards", cors=True, methods=["POST"])
+def post_reward():
+    try:
+        body = app.current_request.json_body
+        challenge = body["challenge"]
+        reward = body["reward"]
+        reward = add_reward(challenge, reward)
+        return Response(
+            body={"reward": reward},
+            status_code=201
         )
     except Exception as e:
         raise ChaliceViewError(e)
