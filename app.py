@@ -101,19 +101,17 @@ def post_run():
         raise ChaliceViewError(e)
 
 
-@app.route("/runs", cors=True, methods=["PATCH"])
-def patch_run():
+@app.route("/runs/{run_id}", cors=True, methods=["PATCH"])
+def patch_run(run_id):
     try:
         body = app.current_request.json_body
-        run_id = body["run_id"]
-        username = body["username"]
-        finish_time = body["finish_time"]
-        average_speed = body["average_speed"]
-        total_distance = body["total_distance"]
-        update_run(
-            run_id, username, finish_time, average_speed, total_distance
-        )
-        return Response(body={}, status_code=204)
+        # username = body["username"]
+        # finish_time = body["finish_time"]
+        # average_speed = body["average_speed"]
+        # total_distance = body["total_distance"]
+        run = update_run(**body, run_id=run_id)
+        print(run)
+        return Response(body={"run": run}, status_code=200)
     except KeyError:
         raise BadRequestError("Bad request body")
     except Exception as e:

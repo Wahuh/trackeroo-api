@@ -12,10 +12,12 @@ def get_user(username):
 def get_all_followers_connection_ids(username):
     user = User.get_user(username)
     followers = user["followers"]
+    print("followers", followers)
     connection_ids = []
     if followers:
         for follower in followers:
             connection_id = Connection.get_connection_id(follower)
+            print("conn_id", connection_id)
             connection_ids.append(connection_id)
     return connection_ids
 
