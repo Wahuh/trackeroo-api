@@ -277,7 +277,8 @@ class Rewards:
             reward_item = {
                 "reward_id": new_reward_id,
                 "challenge": decimal_challenge,
-                "reward": reward
+                "reward": reward,
+                "completed": False
             }
             _rewards_table.put_item(Item=reward_item)
             return reward_item
@@ -291,17 +292,32 @@ class Rewards:
                 Key={
                     'reward_id': reward_id
                 },
-                UpdateExpression='SET winner=:winner',
+                UpdateExpression='SET winner=:winner, completed=:completed',
                 ExpressionAttributeValues={
-                    ':winner': {"S": winner}
+                    ':winner': {"S": winner},
+                    ':completed': True
                 },
                 ReturnValues="ALL_NEW"
             )
             return patch_response
         except Exception as e:
             raise e
-    # @staticmethod
-    # def get_rewards(reward_id, winner):
+
+    @staticmethod
+    def get_rewards(completed):
+        try:
+            if completed == "yes":
+                scan_response = _rewards_table.scan(
+                    FilterExpression=boto3.dynamodb.conditions.Attr("completed").eq(True)
+                )
+            else:
+                scan_response = _rewards_table.scan(
+                    FilterExpression=boto3.dynamodb.conditions.Attr("completed").eq(False)
+                )
+            return scan_response
+        except Exception as e:
+            raise e
+
 
 class Connection:
     @staticmethod
@@ -311,6 +327,7 @@ class Connection:
             put_connection_response = _connections_table.put_item(Item=new_connection_item)
             return put_connection_response
         except Exception as e:
+            print(e)
             raise e
 
     @staticmethod
