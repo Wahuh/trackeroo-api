@@ -57,15 +57,14 @@ def push_runs(event, context):
     if "Records" in event:
         records = event["Records"]
         for record in records:
+            print(record)
             event_name = record["eventName"]
             if event_name == "INSERT":
-                print(record)
                 raw_run = record["dynamodb"]["NewImage"]
                 run = json_util.loads(raw_run)
                 username = run["username"]
                 json_run = json.dumps({"run": run})
                 connection_id = get_connection_id(username)
-                print(connection_id)
                 if connection_id:
                     try:
                         client.post_to_connection(
@@ -73,22 +72,18 @@ def push_runs(event, context):
                         )
                         # app.websocket_api.send(connection_id, json_run)
                     except Exception as e:
-                        print(e)
+                        print("dc", e)
                         pass
                 connection_ids = get_all_followers_connection_ids(username)
                 if connection_ids:
-                    print(connection_ids)
                     for cid in connection_ids:
                         try:
-                            res = client.get_connection(ConnectionId=cid)
-                            print(res)
-                            print(cid, json_run)
                             client.post_to_connection(
                                 Data=json_run, ConnectionId=cid
                             )
                             # app.websocket_api.send(cid, json_run)
                         except Exception as e:
-                            print(e)
+                            print("dc", e)
                             pass
             if event_name == "MODIFY":
                 # check attribute
@@ -98,15 +93,15 @@ def push_runs(event, context):
                 json_run = json.dumps({"run": run})
                 print(json_run)
                 connection_ids = get_all_followers_connection_ids(username)
+                print("cids", connection_ids)
                 if connection_ids:
                     for cid in connection_ids:
                         try:
-                            res = client.get_connection(ConnectionId=cid)
                             client.post_to_connection(
                                 Data=json_run, ConnectionId=cid
                             )
                         except Exception as e:
-                            print(e)
+                            print("dc", e)
                             pass
 
 
