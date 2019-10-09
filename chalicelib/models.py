@@ -111,24 +111,60 @@ class Run:
             raise e
 
     @staticmethod
-    def update_one(
-        run_id, username, finish_time, average_speed, total_distance
-    ):
+    def update_finish_time(username, run_id, finish_time):
         try:
-            patch_run_response = _runs_table.update_item(
+            response = _runs_table.update_item(
                 TableName="runs",
                 Key={"username": username, "run_id": run_id},
-                UpdateExpression="SET finish_time=:finish, average_speed=:average, total_distance=:distance",
+                UpdateExpression="SET finish_time=:finish",
+                ExpressionAttributeValues={":finish": finish_time},
+                ReturnValues="ALL_NEW",
+            )
+            return response["Attributes"]
+        except Exception as e:
+            raise e
+
+    @staticmethod
+    def update_stats(
+        username, run_id, latitude, longitude, average_speed, total_distance
+    ):
+        try:
+            response = _runs_table.update_item(
+                TableName="runs",
+                Key={"username": username, "run_id": run_id},
+                UpdateExpression="SET average_speed=:speed, total_distance=:distance, latitude=:latitude, longitude=:longitude",
                 ExpressionAttributeValues={
-                    ":finish": {"S": finish_time},
-                    ":average": {"N": average_speed},
-                    ":distance": {"N": total_distance},
+                    ":speed": Decimal(str(average_speed)),
+                    ":distance": Decimal(str(total_distance)),
+                    ":latitude": Decimal(str(latitude)),
+                    ":longitude": Decimal(str(longitude)),
                 },
                 ReturnValues="ALL_NEW",
             )
-            return patch_run_response
+            print(response)
+            return response["Attributes"]
         except Exception as e:
+            print(e)
             raise e
+
+    @staticmethod
+    def update_one(**kwargs):
+        print(kwargs)
+        # try:
+        #     patch_run_response = _runs_table.update_item(
+        #         TableName="runs",
+        #         Key={"username": username, "run_id": run_id},
+        #         UpdateExpression="SET finish_time=:finish, average_speed=:average, total_distance=:distance",
+        #         ExpressionAttributeValues={
+        #             ":finish": {"S": finish_time},
+        #             ":average": {"N": average_speed},
+        #             ":distance": {"N": total_distance},
+        #         },
+        #         ReturnValues="ALL_NEW",
+        #     )
+        #     return patch_run_response
+        # except Exception as e:
+        #     raise e
 
     @staticmethod
     def get_runs_by_subscriptions(subscriptions):
@@ -150,7 +186,13 @@ class Run:
 
 
 class Followers:
-    # def get_one
+    @staticmethod
+    def get_one(username):
+        try:
+            response = _followers_table.get_item(Key={"username": username})
+            return response["Item"]
+        except Exception as e:
+            raise e
 
     @staticmethod
     def add_one(username, follower):
@@ -223,8 +265,14 @@ class Connection:
     @staticmethod
     def get_connection_id(username):
         try:
-            get_response = _users_table.get_item(Key={"username": username})
-
+            get_response = _connections_table.get_item(
+                Key={"username": username}
+            )
+            print(
+                get_response,
+                get_response["Item"],
+                get_response["Item"].get("connection_id"),
+            )
             return get_response["Item"].get("connection_id")
         except Exception as e:
             raise e
