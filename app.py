@@ -9,7 +9,7 @@ from chalice import (
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run, get_runs_by_subscriptions, get_users_runs
 from chalicelib.users import add_user, get_users, add_follower, add_subscription, get_user, update_user_distance
-from chalicelib.rewards import add_reward
+from chalicelib.rewards import add_reward, update_reward
 import json
 from chalicelib.models import Connection
 
@@ -212,10 +212,25 @@ def post_reward():
         body = app.current_request.json_body
         challenge = body["challenge"]
         reward = body["reward"]
-        reward = add_reward(challenge, reward)
+        new_reward = add_reward(challenge, reward)
         return Response(
-            body={"reward": reward},
+            body={"reward": new_reward},
             status_code=201
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/rewards", cors=True, methods=["PATCH"])
+def patch_reward():
+    try:
+        body = app.current_request.json_body
+        reward_id = body["reward_id"]
+        winner = body["winner"]
+        update_reward(reward_id, winner)
+        return Response(
+            body={},
+            status_code=204
         )
     except Exception as e:
         raise ChaliceViewError(e)

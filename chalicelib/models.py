@@ -274,20 +274,32 @@ class Rewards:
         try:
             new_reward_id = str(uuid.uuid4())
             decimal_challenge = Decimal(challenge)
-            print(new_reward_id, decimal_challenge, reward)
             reward_item = {
                 "reward_id": new_reward_id,
                 "challenge": decimal_challenge,
                 "reward": reward
             }
-            post_reward_response = _rewards_table.put_item(Item=reward_item)
-            print(post_reward_response)
-            return post_reward_response
+            _rewards_table.put_item(Item=reward_item)
+            return reward_item
         except Exception as e:
             raise e
 
-    # @staticmethod
-    # def patch_reward(reward_id, winner):
+    @staticmethod
+    def update_reward(reward_id, winner):
+        try:
+            patch_response = _rewards_table.update_item(
+                Key={
+                    'reward_id': reward_id
+                },
+                UpdateExpression='SET winner=:winner',
+                ExpressionAttributeValues={
+                    ':winner': {"S": winner}
+                },
+                ReturnValues="ALL_NEW"
+            )
+            return patch_response
+        except Exception as e:
+            raise e
     # @staticmethod
     # def get_rewards(reward_id, winner):
 
