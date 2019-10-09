@@ -22,4 +22,8 @@ def add_subscription(username, subscription):
 
 
 def update_user_distance(username, distance):
-    return User.update_one(username, distance)
+    return User.update_distance(username, distance)
+
+
+def update_user_rewards(username):
+    return User.update_rewards(username)

@@ -18,6 +18,7 @@ class User:
         new_user_item = {
             'username': username,
             'cumulative_distance': 0,
+            'rewards_earned': 0,
             'followers': [],
             'subscriptions': []
         }
@@ -104,7 +105,7 @@ class User:
             raise e
 
     @staticmethod
-    def update_one(username, distance):
+    def update_distance(username, distance):
         try:
             distance_decimal = Decimal(distance)
             update_response = _users_table.update_item(
@@ -114,6 +115,24 @@ class User:
                 UpdateExpression="SET cumulative_distance = cumulative_distance + :distance",
                 ExpressionAttributeValues={
                     ":distance": distance_decimal
+                },
+                ReturnValues="ALL_NEW"
+            )
+            print(update_response)
+            return update_response
+        except Exception as e:
+            raise e
+    
+    @staticmethod
+    def update_rewards(username):
+        try:
+            update_response = _users_table.update_item(
+                Key={
+                    'username': username
+                },
+                UpdateExpression="SET rewards_earned = rewards_earned + :rewards",
+                ExpressionAttributeValues={
+                    ":rewards": 1
                 },
                 ReturnValues="ALL_NEW"
             )

@@ -8,7 +8,7 @@ from chalice import (
 )
 from chalicelib.auth import signup, authorizer, login
 from chalicelib.runs import add_run, update_run, get_runs_by_subscriptions, get_users_runs
-from chalicelib.users import add_user, get_users, add_follower, add_subscription, get_user, update_user_distance
+from chalicelib.users import add_user, get_users, add_follower, add_subscription, get_user, update_user_distance, update_user_rewards
 from chalicelib.rewards import add_reward, update_reward, get_rewards
 import json
 from chalicelib.models import Connection
@@ -245,6 +245,18 @@ def fetch_rewards():
         return Response(
             body={"rewards": rewards},
             status_code=200
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/rewards/{username}", cors=True, methods=["PATCH"])
+def update_users_rewards(username):
+    try:
+        update_user_rewards(username)
+        return Response(
+            body={},
+            status_code=204
         )
     except Exception as e:
         raise ChaliceViewError(e)
