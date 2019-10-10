@@ -16,6 +16,7 @@ from chalicelib.users import (
     add_subscription,
     get_user,
     get_all_followers_connection_ids,
+    update_user_distance,
 )
 import json
 from chalicelib.models import Connection
@@ -163,6 +164,17 @@ def post_user():
         raise BadRequestError("username must be valid")
     except Exception as e:
         raise ChaliceViewError(e)
+
+
+@app.route("/users/{username}", cors=True, methods=["PATCH"])
+def update_user(username):
+    try:
+        body = app.current_request.json_body
+        distance = body["distance"]
+        user = update_user_distance(username, distance)
+        return Response(body={"user": user}, status_code=200)
+    except Exception as e:
+        raise e
 
 
 @app.route("/users/{username}/followers", cors=True, methods=["PATCH"])
