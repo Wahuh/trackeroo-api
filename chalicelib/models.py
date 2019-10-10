@@ -119,18 +119,19 @@ class User:
     def get_users_subscriptions(subscriptions):
         try:
             scan_response = _users_table.scan(
-                    ScanFilter={
-                        "username": {
-                            "AttributeValueList": subscriptions,
-                            "ComparisonOperator": "IN",
-                        }
+                ScanFilter={
+                    "username": {
+                        "AttributeValueList": subscriptions,
+                        "ComparisonOperator": "IN",
                     }
-                )
+                }
+            )
             users = scan_response["Items"]
-            sorted_users = sorted(users, key=lambda run: run["start_time"])
+            sorted_users = sorted(users, key=lambda run: run["cumulative_distance"], reverse=True)
+            return sorted_users
         except Exception as e:
             raise e
-        
+
 
 class Run:
     @staticmethod
