@@ -9,6 +9,7 @@ _runs_table = connection.Table("runs")
 _followers_table = connection.Table("followers")
 _subscriptions_table = connection.Table("subscriptions")
 _connections_table = connection.Table("connections")
+_rewards_table = connection.Table("rewards")
 
 
 class User:
@@ -100,26 +101,20 @@ class User:
         except Exception as e:
             raise e
 
-
     @staticmethod
     def update_rewards(username):
         try:
             update_response = _users_table.update_item(
-                Key={
-                    'username': username
-                },
+                Key={"username": username},
                 UpdateExpression="SET rewards_earned = rewards_earned + :rewards",
-                ExpressionAttributeValues={
-                    ":rewards": 1
-                },
-                ReturnValues="ALL_NEW"
+                ExpressionAttributeValues={":rewards": 1},
+                ReturnValues="ALL_NEW",
             )
             print(update_response)
             return update_response
         except Exception as e:
             raise e
 
-    
     # @staticmethod
     # def update_one(username, first_name, last_name, age, height, weight):
     #         'first_name': first_name,
@@ -369,6 +364,7 @@ class Connection:
         except Exception as e:
             raise e
 
+
 class Rewards:
     @staticmethod
     def add_one(challenge, reward):
@@ -379,7 +375,7 @@ class Rewards:
                 "reward_id": new_reward_id,
                 "challenge": decimal_challenge,
                 "reward": reward,
-                "completed": False
+                "completed": False,
             }
             _rewards_table.put_item(Item=reward_item)
             return reward_item
@@ -390,15 +386,13 @@ class Rewards:
     def update_reward(reward_id, winner):
         try:
             patch_response = _rewards_table.update_item(
-                Key={
-                    'reward_id': reward_id
-                },
-                UpdateExpression='SET winner=:winner, completed=:completed',
+                Key={"reward_id": reward_id},
+                UpdateExpression="SET winner=:winner, completed=:completed",
                 ExpressionAttributeValues={
-                    ':winner': {"S": winner},
-                    ':completed': True
+                    ":winner": {"S": winner},
+                    ":completed": True,
                 },
-                ReturnValues="ALL_NEW"
+                ReturnValues="ALL_NEW",
             )
             return patch_response
         except Exception as e:
@@ -409,11 +403,15 @@ class Rewards:
         try:
             if completed == "yes":
                 scan_response = _rewards_table.scan(
-                    FilterExpression=boto3.dynamodb.conditions.Attr("completed").eq(True)
+                    FilterExpression=boto3.dynamodb.conditions.Attr(
+                        "completed"
+                    ).eq(True)
                 )
             else:
                 scan_response = _rewards_table.scan(
-                    FilterExpression=boto3.dynamodb.conditions.Attr("completed").eq(False)
+                    FilterExpression=boto3.dynamodb.conditions.Attr(
+                        "completed"
+                    ).eq(False)
                 )
             return scan_response["Items"]
         except Exception as e:
