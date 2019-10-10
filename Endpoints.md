@@ -4,14 +4,14 @@
 
 **Post a new run.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "username": "username",
     "start_time": "start_time"
 }
 ```
-Response Body: 
+Response Body:
 ```json
 {
     "username": "username",
@@ -20,11 +20,11 @@ Response Body:
 }
 ```
 _________________________________________________________________
-## PATCH - /api/runs 
+## PATCH - /api/runs
 
 **Update a run with it's required information.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "username": "username",
@@ -49,7 +49,7 @@ _________________________________________________________________
 
 Query Parameter: `?username=<insert username>`
 _________________________________________________________________
-## GET - /api/users/:username/runs 
+## GET - /api/users/:username/runs
 
 **Get all runs for a specific user as an array of runs.**
 
@@ -65,7 +65,7 @@ _________________________________________________________________
 }
 ```
 _________________________________________________________________
-## GET - /api/users 
+## GET - /api/users
 
 **Get all users returns an array of users**
 
@@ -87,7 +87,7 @@ _________________________________________________________________
 
 **Adds a new user to the database.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "username": "username"
@@ -108,7 +108,7 @@ _________________________________________________________________
 
 **Adds the distance for a completed run to the user's cumulative distance key.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "distance": "distance"
@@ -149,7 +149,7 @@ _________________________________________________________________
 
 **Adds a follower to the user's followers array.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "username": <username of follower>
@@ -160,7 +160,7 @@ _________________________________________________________________
 
 **Adds a subscription to the user's subscriptions array.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "username": <username of subscription>
@@ -172,10 +172,11 @@ _________________________________________________________________
 
 **Adds a new reward to the database.**
 
-Request Body: 
+Request Body:
 ```json
 {
-    "challenge": "<running distance to achieve>"
+    "challenge": "<running distance to achieve>",
+    "reward": "<reward to be earned>"
 }
 ```
 `challenge` is a number.
@@ -185,7 +186,7 @@ _________________________________________________________________
 
 **Updates the reward's winner and whether it has been achieved.**
 
-Request Body: 
+Request Body:
 ```json
 {
     "reward_id": "reward_id",

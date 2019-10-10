@@ -14,6 +14,7 @@ from chalicelib.runs import (
     update_run,
     get_runs_by_subscriptions,
 )
+from chalicelib.rewards import add_reward, update_reward, get_rewards
 from chalicelib.users import (
     add_user,
     get_users,
@@ -22,6 +23,7 @@ from chalicelib.users import (
     get_user,
     get_all_followers_connection_ids,
     update_user_distance,
+    update_user_rewards,
 )
 import json
 from chalicelib.models import Connection
@@ -301,7 +303,6 @@ def handle_message(event):
 # wait 5 mins between deletes and deploys because CloudFront caches 500 errors
 
 
-
 @app.route("/rewards", cors=True, methods=["POST"])
 def post_reward():
     try:
@@ -309,10 +310,7 @@ def post_reward():
         challenge = body["challenge"]
         reward = body["reward"]
         new_reward = add_reward(challenge, reward)
-        return Response(
-            body={"reward": new_reward},
-            status_code=201
-        )
+        return Response(body={"reward": new_reward}, status_code=201)
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -324,10 +322,7 @@ def patch_reward():
         reward_id = body["reward_id"]
         winner = body["winner"]
         update_reward(reward_id, winner)
-        return Response(
-            body={},
-            status_code=204
-        )
+        return Response(body={}, status_code=204)
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -341,10 +336,7 @@ def fetch_rewards():
         else:
             completed = query["completed"]
             rewards = get_rewards(completed)
-        return Response(
-            body={"rewards": rewards},
-            status_code=200
-        )
+        return Response(body={"rewards": rewards}, status_code=200)
     except Exception as e:
         raise ChaliceViewError(e)
 
@@ -353,9 +345,6 @@ def fetch_rewards():
 def update_users_rewards(username):
     try:
         update_user_rewards(username)
-        return Response(
-            body={},
-            status_code=204
-        )
+        return Response(body={}, status_code=204)
     except Exception as e:
         raise ChaliceViewError(e)
