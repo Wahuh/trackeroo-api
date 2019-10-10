@@ -153,6 +153,15 @@ def fetch_users():
         raise e
 
 
+@app.route("/users/{username}", cors=True, methods=["GET"])
+def get_user_item(username):
+    try:
+        user = get_user(username)
+        return Response(body={"user": user}, status_code=200)
+    except Exception as e:
+        raise e
+
+
 @app.route("/users", cors=True, methods=["POST"])
 def post_user():
     try:
