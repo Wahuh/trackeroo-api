@@ -9,6 +9,11 @@ def get_user(username):
     return User.get_user(username)
 
 
+def update_user_distance(username, distance):
+    return User.update_distance(username, distance)
+    # return User.update_distance(username, distance)
+
+
 def get_all_followers_connection_ids(username):
     user = User.get_user(username)
     followers = user["followers"]

@@ -86,14 +86,6 @@ class User:
         except Exception as e:
             raise e
 
-    # @staticmethod
-    # def update_one(username, first_name, last_name, age, height, weight):
-    #         'first_name': first_name,
-    #         'last_name': last_name,
-    #         'age': age,
-    #         'height': height,
-    #         'weight': weight,
-
 
 class Run:
     @staticmethod

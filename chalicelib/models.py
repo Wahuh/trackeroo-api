@@ -86,6 +86,20 @@ class User:
         except Exception as e:
             raise e
 
+    @staticmethod
+    def update_distance(username, distance):
+        try:
+            distance_decimal = Decimal(str(distance))
+            update_response = _users_table.update_item(
+                Key={"username": username},
+                UpdateExpression="SET cumulative_distance = cumulative_distance + :distance",
+                ExpressionAttributeValues={":distance": distance_decimal},
+                ReturnValues="ALL_NEW",
+            )
+            return update_response["Attributes"]
+        except Exception as e:
+            raise e
+
     # @staticmethod
     # def update_one(username, first_name, last_name, age, height, weight):
     #         'first_name': first_name,
@@ -96,6 +110,18 @@ class User:
 
 
 class Run:
+    @staticmethod
+    def get_users_runs(username):
+        try:
+            scan_response = _runs_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr("username").eq(
+                    username
+                )
+            )
+            return scan_response["Items"]
+        except Exception as e:
+            raise e
+
     @staticmethod
     def add_one(username, start_time):
         new_run_id = str(uuid.uuid4())
@@ -111,13 +137,25 @@ class Run:
             raise e
 
     @staticmethod
-    def update_finish_time(username, run_id, finish_time):
+    def update_finish_time(
+        username,
+        run_id,
+        average_speed,
+        total_distance,
+        finish_time,
+        coordinates,
+    ):
         try:
             response = _runs_table.update_item(
                 TableName="runs",
                 Key={"username": username, "run_id": run_id},
-                UpdateExpression="SET finish_time=:finish",
-                ExpressionAttributeValues={":finish": finish_time},
+                UpdateExpression="SET average_speed=:speed, total_distance=:distance, coordinates=:coordinates, finish_time=:finish",
+                ExpressionAttributeValues={
+                    ":finish": finish_time,
+                    ":speed": Decimal(str(average_speed)),
+                    ":distance": Decimal(str(total_distance)),
+                    ":coordinates": coordinates,
+                },
                 ReturnValues="ALL_NEW",
             )
             return response["Attributes"]
@@ -126,18 +164,25 @@ class Run:
 
     @staticmethod
     def update_stats(
-        username, run_id, latitude, longitude, average_speed, total_distance
+        username,
+        run_id,
+        latitude,
+        longitude,
+        average_speed,
+        total_distance,
+        coordinates,
     ):
         try:
             response = _runs_table.update_item(
                 TableName="runs",
                 Key={"username": username, "run_id": run_id},
-                UpdateExpression="SET average_speed=:speed, total_distance=:distance, latitude=:latitude, longitude=:longitude",
+                UpdateExpression="SET average_speed=:speed, total_distance=:distance, latitude=:latitude, longitude=:longitude, coordinates=:coordinates",
                 ExpressionAttributeValues={
                     ":speed": Decimal(str(average_speed)),
                     ":distance": Decimal(str(total_distance)),
                     ":latitude": Decimal(str(latitude)),
                     ":longitude": Decimal(str(longitude)),
+                    ":coordinates": coordinates,
                 },
                 ReturnValues="ALL_NEW",
             )

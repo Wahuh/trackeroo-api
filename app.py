@@ -8,7 +8,12 @@ from chalice import (
     WebsocketDisconnectedError,
 )
 from chalicelib.auth import signup, authorizer, login
-from chalicelib.runs import add_run, update_run, get_runs_by_subscriptions
+from chalicelib.runs import (
+    add_run,
+    get_users_runs,
+    update_run,
+    get_runs_by_subscriptions,
+)
 from chalicelib.users import (
     add_user,
     get_users,
@@ -16,6 +21,7 @@ from chalicelib.users import (
     add_subscription,
     get_user,
     get_all_followers_connection_ids,
+    update_user_distance,
 )
 import json
 from chalicelib.models import Connection
@@ -112,7 +118,8 @@ def patch_run(run_id):
         run = update_run(**body, run_id=run_id)
         print(run)
         return Response(body={"run": run}, status_code=200)
-    except KeyError:
+    except KeyError as ke:
+        print(ke)
         raise BadRequestError("Bad request body")
     except Exception as e:
         raise ChaliceViewError(e)
@@ -151,6 +158,24 @@ def fetch_users():
         raise e
 
 
+@app.route("/users/{username}/runs", methods=["GET"])
+def get_runs_by_username(username):
+    try:
+        runs = get_users_runs(username)
+        return Response(body={"runs": runs}, status_code=200)
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/users/{username}", cors=True, methods=["GET"])
+def get_user_item(username):
+    try:
+        user = get_user(username)
+        return Response(body={"user": user}, status_code=200)
+    except Exception as e:
+        raise e
+
+
 @app.route("/users", cors=True, methods=["POST"])
 def post_user():
     try:
@@ -162,6 +187,17 @@ def post_user():
         raise BadRequestError("username must be valid")
     except Exception as e:
         raise ChaliceViewError(e)
+
+
+@app.route("/users/{username}", cors=True, methods=["PATCH"])
+def update_user(username):
+    try:
+        body = app.current_request.json_body
+        distance = body["distance"]
+        user = update_user_distance(username, distance)
+        return Response(body={"user": user}, status_code=200)
+    except Exception as e:
+        raise e
 
 
 @app.route("/users/{username}/followers", cors=True, methods=["PATCH"])
