@@ -115,14 +115,22 @@ class User:
         except Exception as e:
             raise e
 
-    # @staticmethod
-    # def update_one(username, first_name, last_name, age, height, weight):
-    #         'first_name': first_name,
-    #         'last_name': last_name,
-    #         'age': age,
-    #         'height': height,
-    #         'weight': weight,
-
+    @staticmethod
+    def get_users_subscriptions(subscriptions):
+        try:
+            scan_response = _users_table.scan(
+                    ScanFilter={
+                        "username": {
+                            "AttributeValueList": subscriptions,
+                            "ComparisonOperator": "IN",
+                        }
+                    }
+                )
+            users = scan_response["Items"]
+            sorted_users = sorted(users, key=lambda run: run["start_time"])
+        except Exception as e:
+            raise e
+        
 
 class Run:
     @staticmethod
