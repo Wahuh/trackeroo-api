@@ -111,13 +111,25 @@ class Run:
             raise e
 
     @staticmethod
-    def update_finish_time(username, run_id, finish_time):
+    def update_finish_time(
+        username,
+        run_id,
+        average_speed,
+        total_distance,
+        finish_time,
+        coordinates,
+    ):
         try:
             response = _runs_table.update_item(
                 TableName="runs",
                 Key={"username": username, "run_id": run_id},
-                UpdateExpression="SET finish_time=:finish",
-                ExpressionAttributeValues={":finish": finish_time},
+                UpdateExpression="SET average_speed=:speed, total_distance=:distance, coordinates=:coordinates, finish_time=:finish",
+                ExpressionAttributeValues={
+                    ":finish": finish_time,
+                    ":speed": Decimal(str(average_speed)),
+                    ":distance": Decimal(str(total_distance)),
+                    ":coordinates": coordinates,
+                },
                 ReturnValues="ALL_NEW",
             )
             return response["Attributes"]
@@ -126,18 +138,25 @@ class Run:
 
     @staticmethod
     def update_stats(
-        username, run_id, latitude, longitude, average_speed, total_distance
+        username,
+        run_id,
+        latitude,
+        longitude,
+        average_speed,
+        total_distance,
+        coordinates,
     ):
         try:
             response = _runs_table.update_item(
                 TableName="runs",
                 Key={"username": username, "run_id": run_id},
-                UpdateExpression="SET average_speed=:speed, total_distance=:distance, latitude=:latitude, longitude=:longitude",
+                UpdateExpression="SET average_speed=:speed, total_distance=:distance, latitude=:latitude, longitude=:longitude, coordinates=:coordinates",
                 ExpressionAttributeValues={
                     ":speed": Decimal(str(average_speed)),
                     ":distance": Decimal(str(total_distance)),
                     ":latitude": Decimal(str(latitude)),
                     ":longitude": Decimal(str(longitude)),
+                    ":coordinates": coordinates,
                 },
                 ReturnValues="ALL_NEW",
             )

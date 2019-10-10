@@ -112,7 +112,8 @@ def patch_run(run_id):
         run = update_run(**body, run_id=run_id)
         print(run)
         return Response(body={"run": run}, status_code=200)
-    except KeyError:
+    except KeyError as ke:
+        print(ke)
         raise BadRequestError("Bad request body")
     except Exception as e:
         raise ChaliceViewError(e)
