@@ -230,7 +230,11 @@ class Connection:
                 get_response["Item"],
                 get_response["Item"].get("connection_id"),
             )
-            return get_response["Item"].get("connection_id")
+            item = get_response.get("Item")
+            if item:
+                return get_response["Item"].get("connection_id")
+            else:
+                return None
         except Exception as e:
             raise e
 
