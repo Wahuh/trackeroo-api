@@ -45,17 +45,43 @@ Request Body:
 _________________________________________________________________
 ## GET - /api/runs
 
-**Get all runs for a users subscribers.**
+**Get all runs for a users subscribers as an array of runs.**
 
 Query Parameter: `?username=<insert username>`
 _________________________________________________________________
 ## GET - /api/users/:username/runs 
 
-**Get all runs for a specific user.**
+**Get all runs for a specific user as an array of runs.**
+
+```json
+{
+  "runs": [
+    {
+      "username": "username",
+      "run_id": "run_id",
+      "start_time": "start time"
+    }, ...
+    ]
+}
+```
 _________________________________________________________________
 ## GET - /api/users 
 
-**Get all users**
+**Get all users returns an array of users**
+
+```json
+{
+"users": [
+    {
+      "cumulative_distance": "cumulative_distance",
+      "rewards_earned": "number of rewards earned",
+      "username": "username",
+      "followers": [],
+      "subscriptions": []
+    }, ...
+    ]
+}
+```
 _________________________________________________________________
 ## POST - /api/users
 
@@ -105,6 +131,19 @@ _________________________________________________________________
 ## GET - /api/users/:username
 
 **Returns the requested user**
+
+Response Body:
+```
+{
+  "user": {
+    "cumulative_distance": 0.0,
+    "rewards_earned": 2.0,
+    "username": "username",
+    "followers": [],
+    "subscriptions": []
+  }
+}
+```
 _________________________________________________________________
 ## PATCH - /api/users/:username/followers
 
@@ -149,6 +188,7 @@ _________________________________________________________________
 Request Body: 
 ```json
 {
+    "reward_id": "reward_id",
     "winner": "<username of the user that achieved fthe challenge>"
 }
 ```
@@ -158,6 +198,17 @@ _________________________________________________________________
 **Returns all the rewards that have yet to be achieved. If queried as below the response will contain all rewards that have been achieved.**
 
 Query Parameter: `?completed=yes`
+
+Response Body:
+```
+ {
+    "completed": true/false,
+    "reward_id": "reward_id",
+    "challenge": "challenge distance,
+    "winner": "winner,
+    "reward": "reward"
+}
+```
 _________________________________________________________________
 ## PATCH - /api/rewards/:username
 
