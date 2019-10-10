@@ -5,6 +5,10 @@ def add_run(username, start_time):
     return Run.add_one(username, start_time)
 
 
+def get_users_runs(username):
+    return Run.get_users_runs(username)
+
+
 def update_run(**kwargs):
     run_id = kwargs["run_id"]
     username = kwargs["username"]

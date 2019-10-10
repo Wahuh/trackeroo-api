@@ -111,6 +111,18 @@ class User:
 
 class Run:
     @staticmethod
+    def get_users_runs(username):
+        try:
+            scan_response = _runs_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr("username").eq(
+                    username
+                )
+            )
+            return scan_response["Items"]
+        except Exception as e:
+            raise e
+
+    @staticmethod
     def add_one(username, start_time):
         new_run_id = str(uuid.uuid4())
         new_run_item = {
