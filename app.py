@@ -231,10 +231,17 @@ def patch_subscription(username):
 def get_subscriptions(username):
     try:
         user = get_user(username)
+        print(username)
         if user["subscriptions"]:
-            subscriptions = get_user_subscriptions(user["subscriptions"])
-        return subscriptions
+            subscriptions = get_users_subscriptions(user["subscriptions"])
+        return Response(
+            body={
+                "subscriptions": subscriptions,
+            },
+            status_code=200
+        )
     except Exception as e:
+        print(e)
         raise ChaliceViewError(e)
 
 
