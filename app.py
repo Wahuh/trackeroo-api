@@ -299,3 +299,63 @@ def handle_message(event):
 #             raise ChaliceViewError(e)
 
 # wait 5 mins between deletes and deploys because CloudFront caches 500 errors
+
+
+
+@app.route("/rewards", cors=True, methods=["POST"])
+def post_reward():
+    try:
+        body = app.current_request.json_body
+        challenge = body["challenge"]
+        reward = body["reward"]
+        new_reward = add_reward(challenge, reward)
+        return Response(
+            body={"reward": new_reward},
+            status_code=201
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/rewards", cors=True, methods=["PATCH"])
+def patch_reward():
+    try:
+        body = app.current_request.json_body
+        reward_id = body["reward_id"]
+        winner = body["winner"]
+        update_reward(reward_id, winner)
+        return Response(
+            body={},
+            status_code=204
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/rewards", cors=True, methods=["GET"])
+def fetch_rewards():
+    try:
+        query = app.current_request.query_params
+        if query is None:
+            rewards = get_rewards(None)
+        else:
+            completed = query["completed"]
+            rewards = get_rewards(completed)
+        return Response(
+            body={"rewards": rewards},
+            status_code=200
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
+@app.route("/rewards/{username}", cors=True, methods=["PATCH"])
+def update_users_rewards(username):
+    try:
+        update_user_rewards(username)
+        return Response(
+            body={},
+            status_code=204
+        )
+    except Exception as e:
+        raise ChaliceViewError(e)
