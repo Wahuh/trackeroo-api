@@ -23,6 +23,7 @@ from chalicelib.users import (
     get_user,
     get_all_followers_connection_ids,
     update_user_distance,
+    update_user_rewards,
 )
 import json
 from chalicelib.models import Connection

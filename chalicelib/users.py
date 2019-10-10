@@ -9,6 +9,10 @@ def get_user(username):
     return User.get_user(username)
 
 
+def update_user_rewards(username):
+    return User.update_rewards(username)
+
+
 def update_user_distance(username, distance):
     return User.update_distance(username, distance)
     # return User.update_distance(username, distance)
