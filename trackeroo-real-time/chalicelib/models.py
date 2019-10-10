@@ -224,12 +224,6 @@ class Connection:
             get_response = _connections_table.get_item(
                 Key={"username": username}
             )
-            print(get_response)
-            print(
-                get_response,
-                get_response["Item"],
-                get_response["Item"].get("connection_id"),
-            )
             item = get_response.get("Item")
             if item:
                 return get_response["Item"].get("connection_id")
