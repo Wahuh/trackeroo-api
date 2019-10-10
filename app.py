@@ -24,6 +24,7 @@ from chalicelib.users import (
     get_all_followers_connection_ids,
     update_user_distance,
     update_user_rewards,
+    get_users_subscriptions
 )
 import json
 from chalicelib.models import Connection
@@ -226,6 +227,17 @@ def patch_subscription(username):
         raise ChaliceViewError(e)
 
 
+@app.route("/users/{username}/subscriptions", cors=True, methods=["GET"])
+def get_subscriptions(username):
+    try:
+        user = get_user(username)
+        if user["subscriptions"]:
+            subscriptions = get_user_subscriptions(user["subscriptions"])
+        return subscriptions
+    except Exception as e:
+        raise ChaliceViewError(e)
+
+
 # @app.route("/users/{username}/subscriptions", cors=True, methods=["POST"])
 # def post_subscription(username):
 #     try:
@@ -348,3 +360,4 @@ def update_users_rewards(username):
         return Response(body={}, status_code=204)
     except Exception as e:
         raise ChaliceViewError(e)
+

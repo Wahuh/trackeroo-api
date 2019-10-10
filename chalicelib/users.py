@@ -41,3 +41,7 @@ def add_follower(username, follower):
 
 def add_subscription(username, subscription):
     return User.add_subscription(username, subscription)
+
+
+def get_users_subscriptions(subscriptions):
+    return User.get_users_subscriptions(subscriptions)
