@@ -31,7 +31,7 @@ pycparser==2.19
 pyflakes==2.1.1
 PyJWT==1.7.1
 python-dateutil==2.8.0
-PyYAML==5.1.2
+PyYAML==5.4
 rsa==3.4.2
 s3transfer==0.2.1
 simplejson==3.16.0
