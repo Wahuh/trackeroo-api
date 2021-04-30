@@ -32,7 +32,7 @@ pyflakes==2.1.1
 PyJWT==1.7.1
 python-dateutil==2.8.0
 PyYAML==5.1.2
-rsa==3.4.2
+rsa==4.7
 s3transfer==0.2.1
 simplejson==3.16.0
 six==1.12.0
